@@ -1,0 +1,236 @@
+
+---------------------------------------Section 4 ------------------------------------------------------------
+--------------------------Master project - setting up E-COMMERCE
+video 56 -- linkedin
+
+If you are looking to improve your LinkedIn profile and have others endorse your skills, we have a private ZTM LinkedIn group here. LinkedIn allows you to have recruiters message you with lots of job opportunities. You can join the group by clicking on "LinkedIn Group" and then go ahead and endorse some of the member's skills (other people will do the same for you as they join).
+
+If you have any questions, reach out in our private Discord chat community in the #job-hunting channel!
+
+UPDATE!!! Zero to Mastery is officially a recognized school!
+
+What does this mean for you? It means that you can add it as an educational institution on LinkedIn as part of your profile to wow those employers (as your education history). Check it out here. To add it to your profile:
+
+Step 1: Go to personal LinkedIn profile
+
+Step 2: Scroll down to the Education section
+
+Step 3: Click the +
+
+Step 4: Type in Zero To Mastery Academy
+----------------------------------------------------------------------------------------------------------------
+video 57 -- the long road ahead 
+
+para pagos usamos la api de Stripe 
+login con cuenta de google 
+firebase 
+---------------------------------------------------------------------------------------------------
+video 58 -- project overview
+---------------------------------------------------------------------------------------------------
+video 59 -- github project repo
+
+github.com/ZhangMYihua 
+ver lessonNum.. por si tengo problemas 
+
+git clone https://github.com/ZhangMYihua/lesson-1.git nombreCarpeta
+npm install 
+
+luego de trabajar en el proyecto supongamos lo quiero subir a mi repo personal...
+git remote veo sale origin
+git remote remove origin 
+me logeo en mi cuenta de github creo una repo para este proyecto
+git remote add origin https://github...mirepo 
+
+---------------------------------------------------------------------------------------------
+ If you wish to make commits and push code up after cloning down from any of the GitHub links, you should actually fork the project first. The reason for this is because the GitHub project links provided are pointing to repositories you do not own, in order to own the repository, you have to fork it so you get a copy of the project in your own GitHub account that you do own!
+
+ ----------------------------------------------------------------------------------------------------------
+ video 62 -- e commerce homepage + sass 
+ 
+ recordar usar powershell como administrador para no tener permiso de escritura en Datos/
+
+ npx create-react-app crwn-clothing
+
+en el proyecto usamos sass:
+ https://www.npmjs.com/package/node-sass
+
+ npm install node-sass
+(en caso de necesitar borrar usa rm -rf .... o rm -rf node_modules)
+
+ 
+npm install 
+
+creamos src/homepage.styles.scss (descargue los estilos )
+
+creamos src/homepage.component.jsx (importo sass)
+se trata de un functional component porque no vamos a necesitar state o life cycle
+
+quitamos de index.js
+serviceWorker.unregister();
+y el header de App.js 
+borramos contenido de App.css
+
+git remote add origin https://github.com/sitiojcb/crwn-clothing.git
+
+git remote add origin git@github.com:sitiojcb/crwn-clothing.git
+git status 
+
+git add -A 
+
+git commit -m"created project with react and added files for homepage" 
+git push origin master 
+
+---------------------------------------------------------------------------------
+video 63 -- project files + Modules 
+
+comenta que en versiones anteriores jest (para testeo) causaba errores.
+ahora lo han quitado 
+
+------------------------------------------------------------------------------------
+video 64 -- project component architecture 
+
+comenta usar react extension para Chrome
+esta extension se actualizo ,  no lo voy a ver como en el video 
+debo buscar: components y profiler 
+
+pregunta: export default vs const...
+resp:
+export const is named export, this is how you import it
+
+import {abc} from 'abc'
+--------
+export default is unnamed export, this is how import it
+
+import anyname from 'abc'
+------------------------------------------------------------------------------------
+video 65 -- css y scss 
+comenta lo van a proporcionar ellos.
+-----------------------------------------------------------------------------------
+video 66 -- homepage and directory components 
+
+crea carpetas:
+components componentes reusables
+pages paginas
+
+muevo homepage.components.jsx y actualizo en App.js 
+para menu-items.component usamos functional component 
+const MenuItem = () => (
+    uso parentesis para evitar escribir return {}
+)
+------------
+comenta que en lugar de pasarle props como parametro y luego usar props.title 
+simplemente uso destructure con {title}
+
+comenta que directory.component necesito sea class component porque necesito guardar el state de los menu-items
+
+comenta que en react podemos pasar los estilos con 
+    backgroundImage: `url(${imageUrl})`
+    }}>
+    aca imageUrl viene como prop 
+
+ver mas template literals 
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
+------------------------------------------------------------------------------------
+video 67 -- styling menu-items 
+
+cubic bezier 
+https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function
+
+google font source open sans condensed 
+https://fonts.google.com/?query=open+sans+condensed&selection.family=Open+Sans+Condensed:wght@300&sidebar.open=true
+
+en public/ index.html agregamos:
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+luego en App.css en el body agrego:
+font-family: 'Open Sans Condensed', sans-serif;
+
+-----
+git add .
+git commit -m "broken homepage into small comp and style menu-item comp"
+git push origin master 
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------Section 5 ------------------------------------------------------------------------
+----------------------------------------------------React router and routing -------------------------------------------------------------------
+video 68 -- routing in react 
+
+se usa paquete react route 
+comenta que esta libreria usa algo provisto por el navegador llamado history api 
+--------
+Earlier, in single page application, there is an issue of navigation, we can't back and forth as there are no other link or pages, but with react router, which makes the  use of history API provided by browser, which allows single page application to go back and forth without any issues. 
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+video 69 -- routing in our project 
+
+react router documentation 
+https://reactrouter.com/web/guides/quick-start
+
+react router dom 
+https://www.npmjs.com/package/react-router-dom
+
+npm install --save react-router-dom
+
+sirve para cuando tengo varias paginas. hay otras librerias pero esta es la mas popular.
+
+nota: ver que en el video resuelve problema creado en  la instalacion con una version de jest ... yo no lo tuve porque instale versiones compatibles mas nuevas 
+---------------
+para usar react dom necesito importarlo en index.js 
+import { BrowserRouter } from "react-router-dom";
+
+BrowserRouter es un componente. por eso lo coloca envolviendo al otro.
+
+y en App.js 
+lo importo y cambio <HomePage /> por 
+  <Route exact path='/' component={HomePage} />
+
+component por el componente que quiero renderizar 
+path='/' cuando visito / significa vemos el componente HomePage
+exact por defecto es true, significa que si paso / debe ser exacto 
+
+luego usa Switch que se supone ayuda ya que renderiza lo primero que encuentra en el path 
+da ej de '/' y de '/hats' hay entonces mas de una ruta, con switch al encontrar / renderiza eso y nada mas.
+sostiene que ayuda a que no se rendericen varios componentes/rutas por accidente 
+
+lo usa sin exact o exact='false' 
+--------------------------------------------------------------------------------------
+video 70 -- react router dom 
+
+demo:
+A small app bootstrapped with CRA to explain basics of react-routing
+
+https://github.com/ZhangMYihua/react-router-demo
+
+
+-------------------------------------------------------------------------------------
+video 71 -- withRouter() 
+
+Higher order components 
+https://reactjs.org/docs/higher-order-components.html
+
+Concretely, a higher-order component is a function that 
+takes a component and returns a new component.
+
+comenta que el problema de usar history en el router es que debo pasar como props a los childrens... se va haciendo engorroso.
+(lo llaman tambien prop drilling es cuando se pasan todas esas props en este caso history a traves de los childrens.)
+
+otra solucion es usar Higher order component {withRouter}
+por eso importo en menu-item.component
+import { withRouter } from 'react-router-dom';
+luego exporto 
+export default withRouter(MenuItem);
+y ahora el componente MenuItem tiene acceso a location/match que necesitamos para el link
+
+----
+en directory.component cambio
+{this.state.sections.map(({title, imageUrl, id, size}) => (
+<MenuItem key={id} title={title} imageUrl={imageUrl} size={size} />
+ ))}
+ por 
+  {this.state.sections.map(({ id, ...otherSectionProps }) => (
+  <MenuItem key={id} {...otherSectionProps} />
+  ))}
+  ya que comenta que en lugar de agregar por ej linkUrl usamos la ventaja de js6 con destructuring ... 
+  
+--------------------------------------------------------------------------------------
+------------------------------Section 6 -----------------------------------------------
+---------------------------Form components ------------------------------------------
+video 72 -- shoping data 
+
