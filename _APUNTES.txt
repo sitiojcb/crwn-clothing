@@ -228,9 +228,35 @@ en directory.component cambio
   <MenuItem key={id} {...otherSectionProps} />
   ))}
   ya que comenta que en lugar de agregar por ej linkUrl usamos la ventaja de js6 con destructuring ... 
-  
+  git add .
+  git commit -m "update withRouter HOC"
+  git push origin master 
+
 --------------------------------------------------------------------------------------
 ------------------------------Section 6 -----------------------------------------------
 ---------------------------Form components ------------------------------------------
 video 72 -- shoping data 
+descargo fotos o uso const shop 
+
+---------------------------------------------------------------------------------------
+video 73 -- shop page 
+
+creo shop folder dentro de pages y coloco shop.component.jsx 
+creo components/collection-preview y collection-preview.component.jsx 
+-------------------------------------------------------------------------------
+video 74 -- collection item 
+
+creo collection-item y collection-item.component.jsx
+luego en collection-preview.component 
+lo importo y cambio 
+<div key={item.id}>{item.name}</div>
+por 
+ items.filter((item,idx) => idx<4 ).map((id, ...otherItemProps) => (
+  <CollectionItem key={id} {...otherItemProps} />
+))
+
+git status 
+
+-------------------------------------------------------------------------
+video 75 -- header component
 
