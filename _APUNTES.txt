@@ -190,6 +190,9 @@ da ej de '/' y de '/hats' hay entonces mas de una ruta, con switch al encontrar 
 sostiene que ayuda a que no se rendericen varios componentes/rutas por accidente 
 
 lo usa sin exact o exact='false' 
+
+mas info switch:
+https://dev.to/danhjoo7/using-a-switch-component-in-react-router-d2k
 --------------------------------------------------------------------------------------
 video 70 -- react router dom 
 
@@ -256,7 +259,43 @@ por
 ))
 
 git status 
-
+git add -A 
+git commit -m "update collection-preview collection-item"
+git push origin master 
 -------------------------------------------------------------------------
 video 75 -- header component
+
+creamos header 
+y assets /crown.svg 
+ver que para importar svg has sintaxis especial en react !!
+import {ReactComponent as Logo} from ..
+luego usamos como <Logo> 
+--
+comenta que para que el header este presente lo colocamos por encima del switch 
+ <Header />
+
+ -----------
+ pregunta:
+ cuando sigo el link del navegador puedo ir a la pag sin problema, pero si coloco la url directamente no, voy a 404 por que?
+
+ resp:
+ https://stackoverflow.com/questions/11577147/how-to-fix-http-404-on-github-pages
+
+pregunta:
+Why didn't we use <img src="..svg path"> instead of importing it as a component?
+resp:
+both methods work, use whatever you like
+---
+problemas usando otro logo comentan usar:
+<Logo className='logo'  height="60px" width="60px"/>
+mas logos svg en 
+https://www.flaticon.com/free-icon/dollar_3037150?term=price&page=1&position=53
+
+
+git status 
+git add -A 
+git commit -m "adding header" 
+git push origin master 
+
+------------------------------------------------------------------
 
