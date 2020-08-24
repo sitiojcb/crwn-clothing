@@ -298,4 +298,245 @@ git commit -m "adding header"
 git push origin master 
 
 ------------------------------------------------------------------
+video 76 -- importing svg in react
+import { ReactComponent as Logo }
+
+This is a new special syntax when importing SVG in React. The ReactComponent import name is special and tells Create React App that you want a React component that renders an SVG, rather than its filename. You can read more about it here, but keep in mind that this is a React library special syntax:
+
+https://facebook.github.io/create-react-app/docs/adding-images-fonts-and-files
+
+--------------------------------------------------------------------------------------
+video 77 -- forms in react 
+
+https://developer.mozilla.org/en-US/docs/Learn/Forms/Your_first_form
+
+eventPreventDefault()
+https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault
+
+vamos a ver user authentication 
+comenta que como tenemos por ej botones que se repiten en un formulario.. vamos a hacer un componente reusable.
+cada componente sign in y register van a tener cada uno su propio state.
+comenta que no hace falta compartir entre ambos por eso no necesita colocar el state en la pagina por encima de estos componentes.
+comenta que como regla conviene tener el state en el nivel mas bajo posible 
+--------------------------------------------------------------------------------------
+video 78 -- sign in component 
+creo dentro de pages sign-in-and-sign-up
+y dentro sign-in-and-sign-up.component.jsx 
+---
+luego en components creo sign-in/sign-in.component 
+comenta que 
+ this.setState({ [name] : value}) aca [name] va a ser email y luego password.
+
+ pregunta mia:
+ porque usamos required !! no hay algo nativo en react para chequear errores?
+ y sanitizar las entradas? 
+ ---------------------------------------------------------------------------------------
+ video 79 -- form input component 
+
+ creo components/form-input/form-input.component.jsx
+comenta 
+const FormInput = ({ handleChange, label, ...otherProps }) 
+necesito handleChange porque bubbleUp any onChange that input have 
+-colocamos el label y el input juntos en un div group 
+-necesito el label como prop para usarlo selectivamente 
+
+ comenta:
+   (<label className={`${otherProps.value.length ? 'shrink' : ''}`} form-input-label>{label}</label>) 
+   siempre vamos a tener clase form-input-label pero cuando el usuario agrega o tipea algo vamos a ver que agrega clase shrink 
+
+importamos FormInput en sign-in.component y cambio
+<form onSubmit={this.handleSubmit}>
+<input name="email" type="email"
+por 
+<form onSubmit={this.handleSubmit}>
+<FormInput name="email" type="email"
+--
+tambien cambio:
+ onChange={this.handleChange}
+ por 
+ handleChange 
+ agrego ademas label="email" y quito el 
+ <label>Email</label>
+
+-------------------------------------------------------------------------------------
+video 80 -- custom button 
+
+creo custom-button/custom-button.component.jsx 
+luego cambio en sign-in.component.jsx
+<input type="submit"  value="Submit Form" />
+por 
+<CustomButton type="submit">
+Sign In
+</CustomButton>
+-------------------------------------------------------------------------------------
+---------------------------------Section 7 ------------------------------------------
+------------------------Firebase + User authentication ------------------------------
+video 81 -- overview 
+
+necesitamos guardar la info recibida en una base de datos 
+vamos a usar firebase 
+---------------------------------------------------------------------------------------
+video 82 -- firebase intro 
+
+https://firebase.google.com/
+
+backend:
+1 server 
+2 database 
+3 authentication 
+----------
+hasta ahora usamos shop.data.js para la info pero es a modo de ejemplo.
+en la realidad necesitamos una base de datos.
+
+
+pregunta: mongodb vs firebase ?
+resp: parece que firebase resuelve mas que solo database... 
+----------------------------------------------------------------------------------------
+video 83 -- adding a project to firebase 
+
+https://www.npmjs.com/package/firebase
+
+me logeo en 
+https://firebase.google.com/
+go to console 
+add project (lo nombro crwn-db)
+--creo app asociado con webjcb para google analytics
+
+una vez creado nos lleva al dashboard 
+sobre el sidebar vemos diferentes planes 
+usamos el free -- spark
+----
+vemos tambien en el sidebar el sector Develop 
+nos interesan authentication y database 
+comenta que storage es para videos/imagenes assets en general 
+-----------
+desde la ventana principal vemos el icono </> que es el de web !!
+
+me pide registrar app con un nickname...usamos el mismo crwn-db 
+comenta que no necesitmos la parte de hosting 
+---
+me da el sdk:
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-analytics.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCq_FqyhvOMizfVEbDMykbbe69NL71Ynd4",
+    authDomain: "crwn-db-79248.firebaseapp.com",
+    databaseURL: "https://crwn-db-79248.firebaseio.com",
+    projectId: "crwn-db-79248",
+    storageBucket: "crwn-db-79248.appspot.com",
+    messagingSenderId: "732625627403",
+    appId: "1:732625627403:web:58576922fff33f87271a0e",
+    measurementId: "G-B2VZW0YJY0"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
+---------------------------------------------------------
+instalo firebase en mi proyecto:
+
+npm install --save firebase
+-----------------------------------------------------------------------------------------
+video 84 -- note about github 
+
+In the upcoming lessons, we will be adding firebase to our React application. One thing to note is that we will be adding a config object that we get from firebase into our files, and in that config object is an API key. Typically it is good practice not to expose your API key publicly, but in the case of firebase, we have to do so because this is how firebase knows the application is ours! This is perfectly safe, and the intended purpose of this public API key. If you commit your code to Github, you may get a warning from GitGuardian having caught a google key, but GitGuardian has acknowledged that this is not an issue here!
+
+https://twitter.com/search?q=firebase%20api%20key%20gitguardian&src=typd
+
+How we secure our data is actually done with security rules in the firebase dashboard, but we will cover that in a later lesson! So please continue the course without worry :)
+
+---------------------------------------------------------------------------------
+video 85 -- google sign in authentication 
+
+https://firebase.google.com/docs/reference/js/
+
+creamos carpeta firebase 
+y firebase.utils.js 
+comenta que al importar 
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+import 'firebase/auth'
+
+necesito importar firebase como base pero como es muy grande luego tomo solo lo que necesito, en este  caso firestore y auth 
+
+cuando termina de editar firebase.utils.js 
+necesito decirle a google me permita usar google auth 
+volvemos a firebase 
+Develop/authentication --> set-up-sign-in method 
+--habilito google 
+project-732625627403
+--seleccione email 
+maildecali@gmail.com
+----------------------
+luego vamos a sign-in.component y agrego 
+import {signInWithGoogle} from '../../firebase/firebase.utils'
+y
+<CustomButton onClick={signInWithGoogle}>
+Sign In with Google
+</CustomButton>
+----------------------------------------------------------------------------------------
+video 86 -- cloning from this point on 
+
+An important thing to note about any GitHub links that you fork and clone from this point forward is that you must replace the config  in firebase.utils.js  with your own config object in the firebase project overview that we learned in the last lesson. The config object is how firebase knows that your application is connected to your firebase account and database!
+-------------------------------------------------------------------------------------
+video 87 -- signin with google II 
+
+necesito que mi app sepa cuando alguien se ha logeado con exito 
+en App.js 
+import {auth} from './firebase/firebase.utils'
+y convertimos functional component en class component 
+function App() { ahora va a ser 
+class App extends React.Component {
+  gracias a esto tenemos ahora acceso al estado.
+
+  comenta que con firebase obtenemos user authentication session persistance 
+
+  vemos en app como modifica para ver el estado y chequear si esta logeado o no 
+
+-------------------------------------------------------------------------------------
+video 84 -- how to fix 403 - restricted_client error 
+
+It's possible you may encounter a google Authorization error that says 403:restricted_client. 
+If you do, here are the instructions to fix it!
+
+There should be a Learn More link in the popup, clicking that should take you to the Google APIs console that has three tabs under the header named Credentials, OAuth Consent Screen, and Domain Verification. 
+Go to the OAuth Consent Screen tab and update the Application Name to 
+"crwn-clothing" or any other name you're comfortable with 
+(i.e. the name of your project). 
+Click on save at the bottom, then try logging into your verified Google account thereafter.
+
+Thanks to Dylan Flohrschutz for the instructions and solution!
+
+-------------------------------------------------------------------------------------
+video   89 -- google authentication III 
+
+https://www.w3schools.com/cssref/css3_pr_box-sizing.asp
+
+vemos que cuando el usuario esta logeado tenemos que darle opcion de salir 
+debemos agregar sign out en el nav 
+para saber el estado agrega a <Header>
+ <Header currentUser={this.state.currentUser} />
+ luego en header.component 
+ importo auth y en el componente agrega
+  {currentUser 
+        ? 
+        <div className='option' onClick={() => auth.signOut()}>Sign Out </div> 
+        : 
+        <Link className='option' to='/signin'>Sign In</Link>}
+  es decir si esta logeado le da el boton de logout sino tiene el de signin 
+
+luego en el custom button 
+agrego prop isGoogleSignIn 
+ <button className={`${isGoogleSignIn ? 'google-sign-in' : ''} 'custom-button'`}
+
+ 
+--------------------------------------------------------------------------------------
+
 
