@@ -534,9 +534,458 @@ para saber el estado agrega a <Header>
 
 luego en el custom button 
 agrego prop isGoogleSignIn 
- <button className={`${isGoogleSignIn ? 'google-sign-in' : ''} 'custom-button'`}
+ <button className={`${isGoogleSignIn ? 'google-sign-in' : ''} custom-button`}
 
- 
+------------
+git status 
+git add - A 
+git commit -m "integrated firebase and google auth" 
+git push origin master 
+
 --------------------------------------------------------------------------------------
+video 90 -- firebase firestore  !! debo usar cloud Firestore (antes database)
+
+necesito ademas chequear si existe un usuario cuando quiere ingresar con su email/passw 
+tenemos que entender como funciona firestore 
+
+Develop/database --> create database (start in test mode)
+se trata de nosql database (como mongodb) por eso en lugar de tablas usamos 
+collections 
+ej collection user 
+firestore.collection(users).doc('id9949310342')
+o sea de la tabla users el usuario con ese id 
+otra forma 
+firestore.doc('/users/id99..')
+
+-----------------------------------
+##########################
+use primero realtime firestore y me da error no puedo seguir el curso 
+
+error de firestore ?? hubo actualizaciones de google ahora en lugar de database en el sidebar veo realtime database o 
+cloud firestore 
+comenta usar modo nativo:
+https://stackoverflow.com/a/51850105/5338829
+
+usando modo nativo:
+https://console.cloud.google.com/firestore/data?project=api-project-1034170227934
+
+asi que ahora intento con cloud firestore:
+parece que ahora si puedo!! 
+creo users (collection)
+field:displayName 
+valor: cali
+---
+ahora si veo puedo agregar una colleccion dentro de users...
+en el ej agrega cartItems 
+
+para usarlo crea test.js 
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+const firestore = firestore.firestore();
+
+firestore.collection('users').doc('9FSA1cXXu22FSfpDZiw7')
+otra forma
+firestore.doc('/users/9FSA1cXXu22FSfpDZiw7/')
+
+-----------------------------------------------------------------------------------
+video 91 -- async await 
+go to Appendix 1: Key Developer Concepts at the bottom of the course video player, and watch the video titled Async Await first before the next lesson.
+-------------------------------------------------------------------------------------
+video 92 -- storing user data in firebase 
+
+comenta que para trabajar con firestore hay reglas 
+deja un firebase.pdf 
+
+agrerga export const createUserProfileDocument  en firebase.utils.js 
+
+luego lo importo en app y usa
+createUserProfileDocument(user) para ver que devuelve id, path aun cuando se que no existe porque le pase un id falso.. 
+comenta que esto siempre va a devolvernos un objeto 
+en el pdf lo explica 
+le decimos a firebase que guarde o que nos de de la base de datos 
+documentRef object para crud operations 
+set()
+get() -- we get snapshot object 
+update()
+delete()
+---------------------
+ const userRef = firestore.doc('users/1242423')
+    //para obtener el snapshot oj 
+    const snapShot = await userRef.get()
+con esto vemos devuelve prop exists false/true 
+
+snapShot representa la data 
+pero si quiero guardar data necesito usar documentRef !!
+---------------------------------------------------------------------------------------
+video 93 -- Note: Firestore update regarding permissions 
+
+There has been a recent update in Firebase's database for new users where by default, there is a permission rule that disables reading from the database after 30 days! If this is not changed, some of you may start to see an error in your application saying FirebaseError: Missing or insufficient permissions.
+
+This can be quickly fixed by navigating to the rules tab in the database of your firestore console.
+
+You will land on this page, which manages the permissions for your database. We will cover this section in greater depth later in the course.
+
+The text you can edit, and the part to focus on is line 4 and 5:
+
+If you do not see request.time < timestamp.date(year, month, day); on line 5, you don't need to worry about this. If you do, just remove it, and replace the : if with a ; on line 4.
+
+Your final result should look like:
+With that you should be good to continue on!
+---------------------------------------------------------------------------------
+video 94 -- Storing user data in our app 
+in previous video we store the user data in our database but now we have to store that data in the 'state', of our app so we can use it in our app!
+
+por eso modificamos el componentDidMount 
+componentDidMount() {
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async user => {
+      createUserProfileDocument(user)
+      //this.setState({ currentUser: user })
+     // console.log(user)
+    })
+    ahora 
+     componentDidMount() {
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+      if(userAuth) {
+        const userRef = await createUserProfileDocument(userAuth)
+        userRef.onSnapshot(snapShot => {
+         // console.log(snapShot.data)
+         this.setState({
+           currentUser: {
+             id: snapShot.id,
+             ...snapShot.data()
+           }
+         }, () => {
+           //comenta no puedo pasarlo fuera del setState asi que lo paso como segundo parametro (video 94)
+             console.log(this.state)
+         })
+        })
+        
+      } else {
+        //en caso de no estar logeado pasa a ser null 
+        this.setState({currentUser: userAuth})
+      }
+  
+    })
+  }
+
+  luego quito el console log this.state 
+  -------------------------------------------------------------------------------------
+video 95 -- sign up component 
+creo sign-up/sign-up.component.jsx 
+y styles.scss 
+-------
+pregunta: 
+how do [ ] brackets work when you call this.setState
+this.setState({ [name]: value });
+resp: this is just a way to handle every form input change with just 1 handler method.
+
+ver mas:
+https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Basics
+
+------
+pregunta: How do you make the symbol != it shows up something like this =/= but I do != and doesnt shows up
+
+resp: In section 3 Lesson 16 you will find Yihua's exact font he is using.
+ Aside from that in VS code go into  settings --> text editor --> font. 
+ Here you will find a setting called Font Ligatures. 
+ Make sure that is enabled. 
+ Font ligatures are what is changing the !== to =/=
+------
+ pregunta: The componentDidMount is load only once during compoent lifecyle in App.js then how it is able to change state every time when we signin and signout.??
+
+ resp: The componentDidMount function is called only once but when it executes, it registers an event listener onAuthStateChanged provided to us by firebase auth object.
+
+Whenever the user authentication state is changed, i.e., whenever a user signs-in or signs-out, onAuthStateChanged method invokes the function passed as a param to it.
+
+In our case, this method is invoked by onAuthStateChanged.
+----------------------------------------------------------------------------------------
+video 96 -- Sign Up with email and password 
+
+en sign-in-and-sign-up.component.jsx agrego component sign up 
+agrega estilos a sign-in-and-sign-up 
+
+luego en App.js agrego console.log(this.state)
+
+recordar tener habilitada la Authorization en Firebase para email sign in ! ademas de la de google sig in 
+
+git status 
+git add -A 
+git commit -m "store authenticated user in db firestore" 
+git push origin master 
+
+----------------------------------------------------------------------------------------
+video 97 -- Sign Up with email and password 
+
+en sign-in.component importo auth 
+ahora en handleSubmit 
+handleSubmit = event => {
+  la convertimos en async 
+
+  --------------------------------------------------------------------------------------
+  video 98 --note on our custom button 
+One quick note due to the frequency of this question popping up! If you see that your sign in with google button causes the email and password fields to trigger asking the user to fill these in, simply add the property type="button" to our google sign in button! The reason this happens is because any buttons inside of a form element will cause the form to treat the button as type="submit" by default. We don't want that for our google sign in button though, so just make sure to add type="button" to our google sign in CustomButton.
+
+Your code might look like:
+<CustomButton type="button" onClick={signInWithGoogle} isGoogleSignIn>
+  Sign in with Google
+</CustomButton>
+
+---
+pregenta:
+usar constructor y super? 
+resp:
+They discussed this somewhere in the thrid chapter. It's sytacitc sugar added by Babel/Webpack, so you don't need to type out the constructor, just for initializing the state.
+Be aware: When you need props, this does not work.
+
+About super: take a look here https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#Sub_classing_with_extends
+If you extend a class and write a constructor, you need to call super. If you leave out the constructor, it just uses the parent constructor.
+-------------
+
+pregunto yo: 26/08/2020
+no se como chequear si existe snapshot 
+ya que eso evitaria error currenUser Null cuando hago logout en el login ...
+
+resp yo: if(!snapShot.exists) { habia escrito exist en lugar de exists !!
+------------------------------------------------------------------------------------------------
+Quiz: 
+Let's take a quiz to remember the fundamental pattern we must follow if
+ we use the onAuthStateChanged() or onSnapshot() methods!
+
+ 1) Whenever we call the onAuthStateChanged() or onSnapshot() methods 
+ from our auth  library or referenceObject, we get back a function that lets us 
+ unsubscribe from the listener we just instantiated. 
+ Which lifecycle method should we use to call that unsubscribe method in?
+
+resp: componentWillUnmount 
+Calling the unsubscribe function when the component is about to unmount is the best way
+ to make sure we don't get any memory leaks in our application related to listeners 
+ still being open even if the component that cares about the listener 
+ is no longer on the page.
+ ----------------------------------------------------------------------------------------------
+ --------------------------------Section 8 ----------------------------------------------------
+ ----------------------- Redux 1 --------------------------------------------------------------
+ video 100 -- overview 
+
+ comenta lo usamos (a redux) como state managment 
+redux lo hace facil de debug 
+-----------------------------------------------------------------------------------------------
+video 101 -- intro 
+
+redux propone eliminar states y usar props que los pasamos a traves de los componentes 
+y el state lo guarda en el store ( un objeto mayor)
+
+-----------------------------------------------------------------------------------------------
+video 102 -- redux concepts 
+1-cuando nuestra app crece conviene usar redux 
+2- useful to share data between components
+normalmente con react debo subir hacia el padre para poder compartir (one data flow)
+3-predictable state managment using 3 principles:
+1)single source of true (one big object that describes the entiry state of the app ROOT REDUCER)
+2)state is read only
+3)changes using pure functions 
+
+nuevo vocabulario con redux:
+-action (algo que el usuario hace , click button )
+-root reducer (es una funcion recibe un input y da output que influye en el store )
+-store (aca se actualiza el state)
+-dom changes 
+----------------------
+redux is for global state management!
+
+redux usa flux pattern 
+action -> dispatcher -> store -> view 
+
+comenta que flux reemplaza al modelo MVC 
+comenta que con redux ahora no necesitamos en react this.state 
+sin embargo aclara que No todos los states  
+lo importante se guarda en redux store pero otros como por ej form input mantienen sus this.state 
+
+----------------------------------------------------------------------------------------------------
+video 103 -- redux in our app 
+
+comenta que con redux los componentes mediante las acciones actualizan el reduce state de diferentes componentes y estos actualizan solo un slice del state y entre todos estos slices van a modificar el Root State principal o de mi app. Luego desde aca se pasan como props a los componentes .
+
+comenta que redux puede usarse en varios frameworks, no solo en react!
+----------------------------------------------------------------------------------------------------------
+video 104 -- redux actions and reducers 
+
+los reducers son funciones que tienen dos parametros state anterior (currentState) y action y en base a esa accion determina si debe renderizarse y obtener un nuevo objeto o no .
+
+pregunta: After mapStateToProps compares the previous state with the new one, and let's suppose that they're different. When the Virtual DOM comes in play? I mean the state changes, then the Virtual DOM is updated, compared tho the DOM and then updates the parts that are different? 
+
+resp:
+https://programmingwithmosh.com/react/react-virtual-dom-explained/
+----------------------------------------------------------------------------------------------
+video 105 -- settin up redux I 
+react redux 
+https://www.npmjs.com/package/react-redux
+
+npm install react-redux
+------------------
+redux 
+https://www.npmjs.com/package/redux
+
+npm install --save redux
+------------
+redux logger 
+https://www.npmjs.com/package/redux-logger
+
+npm i --save redux-logger
+-----------------
+luego de instalar vamos a index.js 
+los agregamos para poder acceder no solo al store sino a los reducers 
+import { Provider } from 'react-redux' 
+Provider es un componente de react-redux y este debe envolver a nuestra app 
+al ser el padre de todos los componentes va a acceder al store 
+
+redux flow vemos agrega Middleware 
+action -> Middleware -> dispatcher -> store -> view 
+
+creamos folder redux 
+root-reducer.js 
+folder user y user-reducer.js 
+
+pregunta: 
+What is 'SET_CURRENT_USER' exactly? 
+
+resp: redux checks if the type of action matches the case and if matched returns the new state, with it you know what action type caused the state change
+
+-------------
+pregunta:
+1. We set the case as 'SET_CURRENT_USER' in the switch statement. Is SET_CURRENT_USER user-defined for our app or it's something built-in to Redux? Can I change it with some other string?
+
+2. We return currentUser with action.payload. I didn't understand this statement. What does action.payload means and what it does here?
+
+resp:
+1. 'SET_CURRENT_USER' is not something built into Redux and yes you can change it to some other string. You eventually will move your action types into a consts file.
+
+I find it helpful to consider it a "command" that you defined. When that part of the code executes, it sends off the 'SET_CURRENT_USER' command (we call these actions). That action is absorbed by the reducer that contains your switch statement and then actually modifies state.
+
+
+
+So, you might define an action like this in your action file
+
+export const loginUser = (loginStuff) => ({
+   type: LOGIN_USER
+   payload: loginStuff
+});
+
+From your login button, you'd call that action. 
+Then that action is sent to your reducers file that has your switch statement. It checks the type and matches on the LOGIN_USER command.
+
+It then reads the payload (in the example above, loginStuff might be stuff like a username and password) and then executes some code to modify the state. 
+
+
+
+2. action.payload is just the data that was sent along in the original action. So in that example, the currentUser was sent in the payload. The reducer grabs the payload (userStuff) and does something with it (like set the current user to the state)
+-------------------------------
+pregunta: cuando usar destructuring (pero se equivoca porque no era destructing)
+resp:
+const a = 1
+abc({ a })
+is equivalent to
+const b = {a:1}
+abc({...b})
+you are not destructuring, you are creating an object literal, you can understand this as structuring, because it can be destructure later
+
+destructuring only happen when
+
+1. before =  operator
+
+const {a,b,c,}=abc
+2. when naming parameter
+
+const efg = ({e,f,g}) =>{}
+
+do not confuse this with function invoking abc({ a })
+------------------------------------
+
+comenta que el root reducer es un json y el key en este primer ej es user 
+
+---------------------------------------------------------------------------------------
+video 106 -- setting up redux II 
+
+necesitamos crear el store 
+dentro de redux creo store.js 
+
+comenta 
+const middlewares = [logger]
+
+const store = create.store(rootReducer, applyMiddleware(...middlewares))
+de esta manera en applyMiddleware obtenemos todo mediante spread todas las funciones y valores del array logger 
+tambien puede funcionar sin middlewares 
+const store = create.store(rootReducer, applyMiddleware(looger))
+
+importamos el store en index.js 
+y gracias a 
+ <Provider store={store}> ahora podemos pasar props a nuestros components o extraer de estos 
+
+ --
+ necesito crear la funcion action que va a cambiar el reducer ..
+creo user/user.actions.js
+
+ type: 'SET_CURRENT_USER', comenta que como no va a cambiar su valor usamos mayusculas/capital 
+-----------------------------------------------------------------------------------
+video 107 -- connect() and mapStateToProps
+
+https://react-redux.js.org/api/connect
+
+necesitamos el valor de currenUser en el header component que hasta el momento lo viene tomando desde el app.js 
+importo connect en el header component 
+import { connect } from 'react-redux'
+comenta connect is a high order component que es una funcion que  tiene como argumento otros componentes y retorna otro subcomponent 
+
+cambiamos export default Header; por 
+const mapStateToProps = (state) => ({
+    currentUser: state.user.currentUser
+})
+export default connect(mapStateToProps)(Header);
+
+y con esto ahora podemos cambiar en App.js 
+<Header currentUser={this.state.currentUser} />
+ahora 
+<Header />
+-------------------------------------------------------------------------------------
+video 108 -- mapDispatchToProps 
+
+debemos cambiar app.js agregando connect 
+
+const mapDispatchProps = (dispatch) => ({
+  setCurrentUser: user => dispatch(setCurrentUser(user))
+})
+export default connect(null, mapDispatchProps)(App);
+
+y con esto quitamos el constructor del app.js
+ constructor() {
+    super() 
+    this.state = {
+      // currentUser : null // ahora lo coloco en user-reducer
+    }
+  }
+  ----------------------------
+  y en el snapShot cambio el setState 
+// console.log(snapShot.data)
+  this.setState({
+    currentUser: {
+      id: snapShot.id,
+      ...snapShot.data()
+    }
+  })
+  -------------------
+  ahora 
+  const {setCurrentUser} = this.props
+setCurrentUser({
+      id: snapShot.id,
+      ...snapShot.data()
+  })
+-----------------------
+  cambio tambien 
+  <Header currentUser={this.state.currentUser} />
+  por <Header />
+
+---------------------------------------------------------------------------------------
+video 109 -- user redirect and user action type 
+
+https://reactrouter.com/web/api/Redirect
 
 
