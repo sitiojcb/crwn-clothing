@@ -983,9 +983,24 @@ setCurrentUser({
   <Header currentUser={this.state.currentUser} />
   por <Header />
 
+
+pregunto:
+al hacer sign in no cambia en el menu deberia mostrar sign out ...
+pregunte sobre la pregunta de otro y lo mandaban a instalar componente para debug...
+
 ---------------------------------------------------------------------------------------
 video 109 -- user redirect and user action type 
 
 https://reactrouter.com/web/api/Redirect
 
+debemos setear que si existe usuario no aparezca la pagina  de sign up 
+agrego en app redirect 
+cambio 
+<Route exact path='/signin' component={SignInAndSignUpPage} />
+por 
+ <Route exact path='/signin' render={() => this.props.currentUser ? 
+  (<Redirect to='/' />) : 
+  (<SignInAndSignUpPage />)} />
+------------------
+creamos user.types 
 
