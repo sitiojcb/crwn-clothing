@@ -800,6 +800,9 @@ comenta que con redux ahora no necesitamos en react this.state
 sin embargo aclara que No todos los states  
 lo importante se guarda en redux store pero otros como por ej form input mantienen sus this.state 
 
+###########
+lecture 102, currentUser is converted to redux state and we set it in App.js, which mean it is kind of globally accessible state now, what lesson 103 does is just read that state from redux
+
 ----------------------------------------------------------------------------------------------------
 video 103 -- redux in our app 
 
@@ -1003,4 +1006,24 @@ por
   (<SignInAndSignUpPage />)} />
 ------------------
 creamos user.types 
+
+--------------------------------------------------------------------
+video 110 -- cart component 
+copio shopping-bag.svg 
+creo cart-icon
+-------------------------------------------------------------
+video 111 -- cart dropdown
+creo cart-dropdown 
+-------------------------------------------------------------
+video 112 -- implementing redux in Cart 
+
+comenta que la funcionalidad de ocultar/mostrar la hace global por si quiere usarlo en otro lugar y no solo en  el header 
+
+en redux creo cart 
+y cart.actions.js |cart.reducer.js | cart.types.js 
+
+---------------------------------------------------------------
+
+
+
 
