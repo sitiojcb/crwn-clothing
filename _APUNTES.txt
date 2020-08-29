@@ -1022,8 +1022,79 @@ comenta que la funcionalidad de ocultar/mostrar la hace global por si quiere usa
 en redux creo cart 
 y cart.actions.js |cart.reducer.js | cart.types.js 
 
----------------------------------------------------------------
+pregunta: why don't we import root reducer into header component?
+At the bottom of the header component we have our mapsStateToProps function, which takes in user and cart as arguments, which are both referencing the state in the root reducer. However I am confused on how it is retrieving that information if we don't import root reducer into the header component file.
 
+resp: 
+We put all of our reducers into 1 root reducer and then from there we can call the state using connect HOC.
+----------
+####################
+The result of the functions mapStateToProps and mapDispatchToProps allow us access to "props" and that is why we are able to destructure actions or slices of the state in our connected components?
+
+For instance, with the CartIcon component we use mapDispatchToProps to create an object that has the key toggleCartHidden, this becomes accessible to the component after calling
+
+connect(null, mapDispatchToProps)(CartIcon)
+
+and now the CartIcon component has props passed down to it and that is how we destructured toggleCartHidden and added it to an onClick event.
+
+The beauty of this is we no longer have to directly pass down props from a parent component, but we still get access to the props we need by using Redux. Is my understanding correct?
+
+resp: Yes, that is correct. Rather than passing down props from the parent (potentially many, many levels), you are getting those as props from the Redux store via the connect function.
+###
+mapStateToProp as the name suggested map the state in store to component props
+###
+mapDispatchToProps map the dispatch (you can understand it as setState) in store to component props
+
+###########
+en cart.actions:
+comenta que payload es optional property in actional object 
+###############
+ej destructering varios ..
+const mapStateToProps = ({user: {currentUser}, cart: {hidden} }
+----
+ {hidden ? null : <CartDropdown />}
+ si esta oculto == null sino despliego CartDropdown
+---------------------------------------------------------------
+video 113 -- add to cart styling 
+en  CustomButton 
+
+----------------------------------------------------------
+video 114 -- cart item reducer 
+
+redux actions 
+necesito agregar las propiedades que quiero guardar en el reducer 
+agrego en cart.reducer en el initial state 
+cartItems: []
+
+queremos agregar el item cuando el usuario da click 
+agrego  case CartActionTypes.ADD_ITEM: 
+que devuelve un objeto 
+...state.cartItems son los items ya existentes y
+con action.payload agregamos los nuevos 
+
+-----
+en collection-item.component 
+addItem: item => dispatch(addItem(item))
+este addItem viene de cart.actions.js 
+addItem recibe el item como propiedad del addItem que viene del cart.actions luego dispatch al store 
+-------------------------------------------------------------
+video 115 -- adding multiple items to cart 
+descargo shop.data.js comenta que no deben repetirse los id!!
+--
+utility functions allow us to keep our files clean and organize
+functions that we may need in multiple files in on location.
+--
+en redux/cart creo cart.utils.js 
+---
+cartItem.find() retorna el primer valor del array basandose en la condicion que pasemos dentro .
+--
+cartItem.find(cartItem => cartItem.id === cartItemToAdd.id )
+si coinciden lo devuelve sino da undefined 
+------------
+git status 
+git add -A 
+git commit -m"
+git push origin master 
 
 
 
