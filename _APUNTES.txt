@@ -1104,8 +1104,66 @@ video 117 -- cart item component
 creo cart-item 
 y cart-item.component 
 luego lo importo en cart-dropdown 
+-----------------
+pregunta: We are consuming our data from a file and in real life scenarios that will not be the case it will be from a Rest-Api then how are we going to connect it to our redux and everything?
+resp: 
+later on in the course you will learn how to use firebase.
 
+pregunta:
+I feel that all these de-structuring is making it difficult to understand, please also include the non refactored versions of the code in the lectures.
+resp:
+it would look like this always using props to get access and you :
+const Directory = props =>(     <div className='directory-menu'>         {         props.sections.map(({id, ...otherSectionProps }) => (             <MenuItem key= {id} {...otherSectionProps} />         ))         }     </div>
 
+look how beautiful destructuring can be:
 
+const CartItem = ({item: {imageUrl, price, name, quantity}}) => (
 
+    <div className='cart-item'>
 
+        <img src={imageUrl} alt= 'item'/>
+
+        <div className='item-details'>
+
+            <span className='name'>{name}</span>
+
+            <span className='price'>{quantity} x  {price} €</span>
+        </div>
+    </div>
+
+)
+-------------------
+pregunta: nice scrollbar?
+resp: agregue codigo en cart-dropdown.styles 
+pero parece solo sirve para chrome.. 
+
+ver problema en mac 
+https://stackoverflow.com/questions/46734299/macs-not-reliably-displaying-horizontal-scroll-bars
+
+---------------------------------------------------------
+video 118 -- optional reduce()
+
+If you are new to the concept of using the reduce() function which we will see in the next video, and you would like to learn more, we created a bonus video to explain the function in more detail. Simply go to Appendix 1: Key Developer Concepts at the bottom of the course video player, and watch the video on the reduce() method.
+------------------------------------------------------------
+video 119 -- selectors in redux 
+
+https://www.npmjs.com/package/reselect
+
+npm install reselect
+
+para usar memoization se usa la libreria reselect 
+-----------------------------------------------------------
+video 120 -- optional memoization
+
+In the next videos, we are going to use reselect which as we mentioned in the previous video, will allow us to memoize and not re-render a component if the state value does not change. If you want to learn more about Memoization and how it works with JavaScript, simply go to Appendix 1: Key Developer Concepts at the bottom of the course video player, and watch the video titled Memoization from my Master the Coding Interview: Data Structures + Algorithms course which I have included for you.
+-------------------------------------------------------------
+121 -- reselect library 
+instalo la libreria con 
+npm install reselect
+
+creo dentro de cart 
+cart.selectors.js 
+
+luego importa en cart-icons 
+
+luego remplaza en cart-dropdown.component
