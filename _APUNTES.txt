@@ -1095,6 +1095,17 @@ git status
 git add -A 
 git commit -m"
 git push origin master 
+------------------------------------------------------------
+video 116 -- optional find 
+
+If you are new to the concept of using the find() function we saw in the previous video and you would like to learn more, we created a bonus video to explain the function in more detail. Simply go to Appendix 1: Key Developer Concepts at the bottom of the course video player, and watch the video on the find() method.
+-------------------------------------------------------------
+video 117 -- cart item component 
+creo cart-item 
+y cart-item.component 
+luego lo importo en cart-dropdown 
+
+
 
 
 
