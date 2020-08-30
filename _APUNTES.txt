@@ -1337,3 +1337,50 @@ o el &#10005; devuelve X
 creo checkout-item 
 
 ----------------------------------------------------------
+video 129 -- remove item from cart 
+
+necesito crear funcionalidad del boton de remover X 
+
+agrego en cart.types.js 
+  CLEAR_ITEM_FROM_CART: 'CLEAR_ITEM_FROM_CART'
+  luego en cart.actions.js 
+
+export const clearItemFromCart = item => ({
+    type: CartActionTypes.CLEAR_ITEM_FROM_CART,
+    payload: item
+})
+luego debo actualizar el reducer ya que este va a ser el que remueva el item del array 
+en cart.reducer 
+agrego otro case 
+cartItems: state.cartItems.filter(
+cartItem => cartItem.id !== action.payload.id )
+aca estoy diciendo que si el id del item no coincide con el del array lo deje, es decir no lo borra 
+
+luego en checkout-item.component 
+------------------------------------------------------------
+video 130 -- remove items at checkout 
+
+en la pag checkout tengo < 4 > es decir que con < debe poder quitar y con > poder sumar...
+
+en checkout-item.component 
+<span className='quantity'>
+  <div className='arrow' >&#10094;</div>
+      <span className='value'>{quantity}</span>
+  <div className='arrow' >&#10095;</div>
+  </span>
+-----------
+en cart.types agrego nueva accion 
+export const removeItem = item => ({
+    type: CartActionTypes.REMOVE_ITEM,
+    payload: item
+})
+luego en el cart.reducer 
+agrego un case para remove pero ademas necesito agregar en cart.utils el removeItemFromCart
+
+luego agrego en checkout-item 
+
+git status 
+git add -A 
+git commit -m "add add/remove functionality to checkout-item"
+git push origin master 
+--------------------------------------------------------------
