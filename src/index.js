@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 // using ES6 modules
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from 'react-redux'
+
 import store from './redux/store'
+
 import './index.css';
 import App from './App';
 

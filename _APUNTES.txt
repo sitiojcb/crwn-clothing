@@ -1054,6 +1054,17 @@ const mapStateToProps = ({user: {currentUser}, cart: {hidden} }
 ----
  {hidden ? null : <CartDropdown />}
  si esta oculto == null sino despliego CartDropdown
+
+ ----
+ pregunta: no entiendo mapStateToProps 
+ resp:
+ In mapStateToProps, we specify the parts of the state that we want to retrieve from the Redux Store.
+
+We then pass mapStateToProps as the first argument of the connect() HOC.
+
+connect() provides the connection between our React component & the Redux Store; so that we can access state from the Redux Store within our React component.
+
+With our component connected to the store, we can pass the state (retrieved from the Redux Store) into our connected React component via props.
 ---------------------------------------------------------------
 video 113 -- add to cart styling 
 en  CustomButton 
@@ -1152,10 +1163,31 @@ https://www.npmjs.com/package/reselect
 npm install reselect
 
 para usar memoization se usa la libreria reselect 
+
+queremos que dentro del icono de cart aparezca el numero total de items que se van agregando 
+en cart-icon.component.jsx 
+
+escribimos lo que llama un selector :
+const mapStateToProps = ({cart: {cartItems}}) => ({
+     itemCount: cartItems.reduce((accumulatedQuantity, cartItem) => accumulatedQuantity +cartItem.quantity , 0)
+ })
+
+ comenta escribimos codigo que contiene un state pero que va a hacer un push de una porcion(slide) de ese state
+
+ el problema de este aproch es que esta renderizando a cada instante cada vez que agregamos items 
+ cada vez que reduce es llamado genera un nuevo objeto y esto es malo para performance por eso usamos la libreria memoization y vamos a cambiar ese mapStateToProps 
 -----------------------------------------------------------
 video 120 -- optional memoization
 
 In the next videos, we are going to use reselect which as we mentioned in the previous video, will allow us to memoize and not re-render a component if the state value does not change. If you want to learn more about Memoization and how it works with JavaScript, simply go to Appendix 1: Key Developer Concepts at the bottom of the course video player, and watch the video titled Memoization from my Master the Coding Interview: Data Structures + Algorithms course which I have included for you.
+
+articulo sobre memoization:
+https://blog.cloudboost.io/reselect-source-code-seeing-closure-and-memoization-in-practice-8d12139cb756
+
+articulo sobre closures js: 
+https://medium.com/madhash/understanding-closures-in-javascript-in-3-minutes-557ebb8a215b
+
+Writing closures is more than just the act of putting a function inside another function. It is the technique used to create variables that are protected against external change, truly isolated from the rest of the application and are persistently stateful.
 -------------------------------------------------------------
 121 -- reselect library 
 instalo la libreria con 
@@ -1167,3 +1199,141 @@ cart.selectors.js
 luego importa en cart-icons 
 
 luego remplaza en cart-dropdown.component
+
+pregunta: comenta que esta leccion lleva a malosentendidos 
+resp:
+
+Here with reselect we want to prevent our cart-icon component from re-rendering if our redux state changes with values that are unrelated to which pieces of the state our cart-icon cares about. In this case the cart items. Our cart-icon component re-renders whenever new props get passed to it. In the case before we added reselect, whenever our currentUser changes from signing in and signing out, we would end up with a brand new object for our redux store because redux always builds a new object when any prop on it changes. This means that mapStateToProps in cart-icon component re-runs and will rerun our reduce function giving our cart icon a new prop, even if it has the same value as before the currentUser changed. With reselect we are memoizing the value of each selector that calls createSelector, as long as the value parameters passed in haven't changed, then our selector won't re-compute and just returned the previously memoized value. Therefore when we move our cartItemCount reduce function into a selector, which itself relies on the selectCartItems selector, both of these selector functions won't run as long as Cart or CartItems in our redux store haven't changed. As a result, in our CartIcon component, the mapStateToProps still gets fired on every state change in redux, but they won't pass new props into our CartIcon component which means it doesn't re-render.
+
+Are we maybe talking about the same thing just that I'm unclear in the video leading students to believe that I'm saying by using selectors our component won't re-render ever?
+
+-----------------------------------------------------------
+video 122 -- correction on cart-icon re rendering 
+
+I made one mistake in explaining our CartIcon component and the itemCount! Due to itemCount being a primitive (integer), redux will do a shallow equality check under the hood between state changes in mapStateToProps. 
+
+In this case having a selector does not save us on any re-renders of the CartIcon component. If our overall state changes but the itemCount value stays the same between these changes,  redux's shallow equality check will see that itemCount is the same value as last time and save us a re-render. 
+
+It's still valuable to keep the logic for the reduce in a selector though because we do still want to memoize the calculation of itemCount (our reduce logic), and without a selector our reduce logic would still be running on every state change regardless of the final calculated value of itemCount.
+
+The take away here is that redux's mapStateToProps has a shallow equality check for every value in the object; 
+it won't replace values if they pass a shallow equality check which means it won't needlessly re-render, but if we have transformation logic it's still valuable to memoize it with a selector to save us running duplicate logic to get the same output.
+
+comentarios:
+how to compare objects in JS ?
+https://dmitripavlutin.com/how-to-compare-objects-in-javascript/
+
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of
+-------------------------------------------------------------
+video 123 -- user selectors 
+
+creamos dentro de redux user 
+user.selectors.js 
+
+agregamos en cart.selectors:
+export const selectCartHidden = createSelector(
+    [selectCart],
+    cart => cart.hidden
+)
+----------------------------------------
+en header.component. 
+importamos 
+import {createStructuredSelector} from 'reselect'
+y 
+import { selectCurrentUser } from '../../redux/user/user.selectors'
+
+luego cambio
+const mapStateToProps = ({user: {currentUser}, cart: {hidden} }) => ({
+    //currentUser: state.user.currentUser
+    currentUser,
+por: 
+const mapStateToProps = createStructuredSelector({
+    currentUser: selectCurrentUser,
+    hidden: selectCartHidden
+})
+
+luego en App.js 
+import { createStructuredSelector } from 'reselect'
+import { selectCurrentUser } from './redux/user/user.selectors'
+
+//video 109
+const mapStateToProps = ({ user }) => ({
+  currentUser: user.currentUser
+});
+
+cambio por: 
+const mapStateToProps = createStructuredSelector => ({
+  currentUser: selectCurrentUser
+});
+comenta usar selectCurrentUser en otros componentes como 
+dropdown.component 
+cambio 
+// const mapStateToProps = ({cart: {cartItems}}) => ({
+//     cartItems
+// }) ahora con cart.selectors 
+const mapStateToProps = state => ({
+    cartItems: selectCartItems(state)
+})
+ahora con selectCurrentUser 
+const mapStateToProps = createStructuredSelector ({
+    cartItems: selectCartItems
+})
+-----------
+cambio tambien en cart-icon 
+// const mapStateToProps = ({cart: {cartItems}}) => ({
+//     itemCount: cartItems.reduce((accumulatedQuantity, cartItem) => accumulatedQuantity +cartItem.quantity , 0)
+// })
+const mapStateToProps = state => ({
+    itemCount: selectCartItemsCount(state)
+})
+ahora 
+const mapStateToProps = createStructuredSelector ({
+    itemCount: selectCartItemsCount
+})
+----------------------------------------------------------
+video 124 -- checkout page I
+
+modificamos cart-dropdown.component 
+
+coercion en JS ! 
+"1" == 1 da true compara valores 
+"1" === 1 da false porque ademas de comparar el valor compara ademas el tipo, type en este caso string es diferente a numero!
+
+-------------
+creamos checkout page 
+en pages/checkout creo checkout.component.jsx
+luego lo importo en App.js 
+luego uso en cart-dropdown.component history push para dirigirlo a checkout page 
+-----------------------------------------------------------
+video 125 -- checkout page II
+
+en cart.selectors creo selectCartTotal 
+
+pregunta: why don't we do the reduce() in the component instead of in selector?
+resp: We use the reduce() method in a selector because we want to keep the logic and the math behind all that separate from the component itself. 
+We try to keep the UI rendering part to the React.Component and as we are using redux, which is the data layer, we try and keep the logic and math related to the data stored in state in those files. Hence, we keep the reduce() method in the selectors separate from the React UI Components.
+--
+ like: 
+Memoization which imporves performance by only rendering states only when a change occurs.
+And also the ability to reuse and pass these selectors to other components.
+
+articulo sobre selectors:
+https://medium.com/@pearlmcphee/selectors-react-redux-reselect-9ab984688dd4
+------------------------------------------------------------
+video 126 -- extensible code 
+
+video 127 -- dispatch action shorthand
+
+queremos que al redireccionar el dropdown vuelva a estar hidden 
+-----------------------------------------------------------
+video 128 -- checkout item component 
+
+con escribir el codigo podemos renderizar algunos iconos!
+https://www.w3schools.com/charsets/ref_utf_dingbats.asp
+
+ej &#10004; muestra un check marcado 
+o el &#10005; devuelve X
+creo checkout-item 
+
+----------------------------------------------------------
