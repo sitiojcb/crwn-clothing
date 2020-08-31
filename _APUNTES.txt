@@ -1667,3 +1667,86 @@ If you want to learn more about why this is, this is a great resource for you to
 -------------------------------------------------------
 video 143 -- data flow in our app 
 
+-------------------------------------
+video 144 -- thinking data flow 
+
+--------------------------------------------------------------
+----------------------Section 13 ------------------------------
+------------Stripe payments I --------------------------------
+video 145 -- intro 
+
+stripe is a platform that allows us handle online payments 
+
+para habilitar pagos necesitamos back end services (no lo cubre aca , lo vemos mas adelante )
+
+https://stripe.com/
+
+sign in free account !! 
+---------------------------------------------------------
+video 146 -- stripe integration 
+
+https://www.npmjs.com/package/react-stripe-checkout
+
+npm install react-stripe-checkout
+
+developers tab/api keys 
+usamos de momento solo el 
+publishable key :
+pk_test_51HMKoTHJvzpD2w2pczJCxd6lwAQBB4Xx3yPMYQ6ucQqNOxARBYiFmf8BJAecFrEIAoAvke6poY5gUBtlUzE74oUk00d3lk38aC
+
+-----------------
+creamos components/stripe-button 
+stripe-button.component.jsx 
+
+https://github.com/azmenak/react-stripe-checkout 
+vemos opciones 
+
+const priceForStripe = price * 100; es el valor en centavos que vamos a pasar a stripe 
+
+luego lo importamos en checkout.component 
+
+------------test datos tarjeta:
+4242 4242 4242 4242 
+csv 123 
+01/22 
+------------
+https://stripe.com/docs/testing#cards
+-------------------
+pregunta: porque no usar react own stripe component con 
+
+https://stripe.com/docs/stripe-js/react ?
+
+resp: esa es otra posibilidad 
+
+---------------------------------------------------------
+video 147 -- note about test credit cards for stripe 
+
+As of January 2020, our test credit card date is now past 01/20 so you'll see an error using this date. Just change the test date to any date in the future from your current date! You can find more details about this at the link here for documentation on stripe's testing cards.
+---------------------------------------------------------------
+video 148 -- cloning from this point on 
+
+From this point on, if you fork and clone any GitHub links for this course, 
+you must remember to set the publishableKey  in 
+stripe-button.component.jsx 
+to your own publishable_key value in your stripe dashboard.
+
+ This key allows stripe to know that requests from any stripe checkout components are connected to your stripe account!
+  
+  You can find the key under the Developers Tab, and then the API keys tab in the menu that opens!
+
+-----------------------------------------------------------
+video 149 -- touches + look ahead 
+
+descargo favicon 
+en index.html cambio el titulo 
+al tener 
+<link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+solo tengo que colocar el favicon en public
+
+con esto comenta terminamos nuestra app !! 
+falta deploy ..
+
+git status 
+git add -A 
+git commit -m "stripe integration, change favicon"
+git push origin master 
