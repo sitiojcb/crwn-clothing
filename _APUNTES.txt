@@ -41,6 +41,9 @@ git remote remove origin
 me logeo en mi cuenta de github creo una repo para este proyecto
 git remote add origin https://github...mirepo 
 
+pregunta: git add . vs git add -A ??
+resp:
+Note: The command git add . only stages files in the current directory and not any subdirectories, whereas git add -A will stage files in subdirectories as well.
 ---------------------------------------------------------------------------------------------
  If you wish to make commits and push code up after cloning down from any of the GitHub links, you should actually fork the project first. The reason for this is because the GitHub project links provided are pointing to repositories you do not own, in order to own the repository, you have to fork it so you get a copy of the project in your own GitHub account that you do own!
 
@@ -1384,3 +1387,283 @@ git add -A
 git commit -m "add add/remove functionality to checkout-item"
 git push origin master 
 --------------------------------------------------------------
+---------------------Section 9 -------------------------------
+---------------Session storage and persistance ---------------
+video 131 -- local storage and persistance 
+
+window localstorage:
+https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+
+window sessionstorage:
+https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
+
+---la diferencia es que en 
+sessionstorage persiste si hace un refresh de la pagina pero no si cierra la pagina va a perder todo.
+en tanto que en el  local storage mantiene aun cerrando el navegador cuando vuelve sigue en el mismo lugar.
+
+----
+comenta se puede lograr guardar la info con firebase en lugar de localstorage pero lo deja para mas adelante.
+
+tambien con una libreria redux-persist 
+es mas...redux persist en realidad maneja el localstorage 
+
+en local storage tenemos 
+getItem y setItem
+
+
+pregunta: why data not persist?
+if we store in a variable?
+resp:
+whenever the app refreshes, all the redux state gets erased and it goes back to the default state in the store.
+--
+in the cart reducer our initial state looks like this:
+
+const INITIAL_STATE = { 
+   hidden: true, 
+   cartItems: [],
+};
+
+So that's the initial state the application knows of when the page is refreshed. In the future, redux persist is implemented though to persist the updated state.
+--------------------------
+localStorage has limit of 10mb 
+-------------------------------------------------------------
+video 132 -- redux persist 
+
+nos permite manejar tanto el localstorage como la sessionstorage
+permite que el navegador lo guarde en el cache 
+
+
+https://www.npmjs.com/package/redux-persist
+
+npm install redux-persist
+
+luego el el store.js 
+const persistor = persistStore(store) 
+ 
+export default {store, persistor };
+
+luego en root-reducer.js
+import { persistReducer } from 'redux-persist'
+y con 
+import storage from 'redux-persist/lib/storage'
+le digo que quiero usar redux persist como mi default localstorage 
+
+const persistConfig = { 
+    key: 'root',
+    storage, 
+    whitelist: ['cart']
+}
+comenta que solo quiero guardar el cart porque el user lo maneja firebase 
+
+ahora en index.js 
+import { PersistGate } from 'redux-persist/integration/react'
+
+-----------------------------------------------------------
+-------------------------Section 10 ----------------------
+-----------------Redux II ----------------------------------
+video 133 -- directory state into redux 
+
+cambio directory.component.jsx
+creo redux/directory 
+y directory.reducer.js en donde coloco el array que tenia en shop.data.js 
+
+comenta: conviene o no? tenerlo en redux?
+parece hay beneficios..
+
+actualiza root.reducer 
+actualiza directory.component.jsx
+quito 
+class Directory extends React.Component {
+ constructor() {
+        super()
+        this.state = {
+         sections: [
+                {
+                    title: 'hats',
+                    imageUrl: 'https://i.ibb.co/cvpntL1/hats.png',
+                    id: 1,
+                    linkUrl: 'shop/hats'
+                },
+                {
+                    title: 'jackets',
+                    imageUrl: 'https://i.ibb.co/px2tCc3/jackets.png',
+                    id: 2,
+                    linkUrl: 'shop/jackets'
+                },
+                {
+                    title: 'sneakers',
+                    imageUrl: 'https://i.ibb.co/0jqHpnp/sneakers.png',
+                    id: 3,
+                    linkUrl: 'shop/sneakers'
+                },
+                {
+                    title: 'womens',
+                    imageUrl: 'https://i.ibb.co/GCCdy8t/womens.png',
+                    size: 'large',
+                    id: 4,
+                    linkUrl: 'shop/womens'
+                },
+                {
+                    title: 'mens',
+                    imageUrl: 'https://i.ibb.co/R70vBrQ/men.png',
+                    size: 'large',
+                    id: 5,
+                    linkUrl: 'shop/mens'
+                }
+            ]
+        }
+        render() {
+        return (
+            <div className="directory-menu">
+                {this.state.sections.map(({ id, ...otherSectionProps }) => (
+                    <MenuItem key={id} {...otherSectionProps} />
+                ))}
+            </div>
+        )
+    }
+ }
+-----------------------------
+y cambio por:
+const Directory = () =>  {
+  porque ya no necesito usar el state aca.
+
+------------------------------------------------------------
+video 134 -- collection state to redux 
+
+quiero mover shop.data.js 
+creo redux/shop y shop.reducer.js 
+y shop.selectors.js 
+movemos shop.data.js a esta carpeta
+
+una vez creado el reducer lo importo en root reducer 
+y modifico el shop.component.jsx 
+quito 
+class ShopPage extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            collections:  SHOP_DATA
+        }
+    }
+    render() {
+        const {collections} = this.state;
+        return (
+            <div className='shop-page'>
+                {
+                    collections.map(({id, ...otherCollectionsProps}) => (
+                        <CollectionPreview key={id} {...otherCollectionsProps} /> 
+                    ))
+                }
+            </div>
+        )
+    }
+}
+-------------------
+ahora 
+const ShopPage = ({collections}) => (
+  -----
+
+pregunta:
+why using selectors?
+resp:
+The summary would be that it prevents the mapstatetoprops function from being triggered when unnecessary
+--
+to avoid the same computations while deriving the some data from a part of the state if there were no changes in that part of the state...
+
+-------------------------------------------------------------
+video 135 -- collection overview 
+
+vamos a crear category 
+comenta que hasta ahora tengo rutas a la pagina superior 
+pero ahora necesito nested routes 
+
+vamos a mover el collections.map del shop.component a un componente propio 
+creo en components collections-overview 
+y collections-overview.component.jsx 
+
+-----------------------------------------------------------
+-----------------------Section 11 -------------------------
+-------------------Advanced routing ------------------------
+video 136 -- nested routing in shop page 
+
+comenta que route pasa como props match/location/history 
+
+creamos en pages/category 
+y category.component.jsx 
+luego actualiza page/shop.component.jsx
+------------------------------------------------------
+video 137 -- improving naming of component 
+
+comenta se equivoco y renombra a collection (en lugar de category)
+renombramos la carpeta y files...
+---------------------------------------------------------
+video 138 -- collection routing and selector 
+-----------------------------------------------------
+video 139 -- memoizing selectCollection and collectionUrlParam 
+
+----OJO hice esto y luego desinstale.... ver comentarios 
+
+Memoizing selectCollection and collectionUrlParam
+One quick addition, our selectCollection function we just wrote is not memoized due to collectionUrlParam being passed in from our collection component's mapStateToProps running whenever our state changes and and calling a new instance of our selectCollection function. In this case collectionUrlParam is a dynamic argument meaning it can change, so to memoize selectCollection we actually have to memoize the whole function using a memoize helper function. We can leverage the lodash library, specifically their memoize helper function by adding it our packages like so:
+
+If using yarn:
+
+yarn add lodash.memoize
+
+
+If using npm:
+
+npm install lodash.memoize
+
+
+And to use it, we import our newly installed memoize helper function at the top of shop.selectors.jsx like so:
+
+import memoize from 'lodash.memoize';
+And just wrap our selectCollection function with memoize like so:
+
+export const selectCollection = memoize((collectionUrlParam) =>
+  createSelector(
+    [selectCollections],
+    (collections) => collections[collectionUrlParam]
+  )
+);
+
+Memoize does the same idea of memoization as reselect does for our selectors, except this time we're memoizing the return of our function which returns our selector:
+
+(collectionUrlParam) =>
+  createSelector(
+    [selectCollections],
+    (collections) => collections[collectionUrlParam]
+ )
+By wrapping this function is memoize, we're saying that whenever this function gets called and receives collectionUrlParam, I want to memoize the return of this function (in this case we return a selector). If this function gets called again with the same collectionUrlParam, don't rerun this function because we'll return the same value as last time, which we've memoized so just return the selector that's been stored.
+
+----------------------------------------------------------
+video 140 -- optional currying 
+In the previous video, we saw the concept of currying being applied with our selector. If you want to learn more about currying and how it works with JavaScript, simply go to Appendix 1: Key Developer Concepts at the bottom of the course video player, and watch the video titled Currying from my Advanced JavaScript Concepts course which I have included for you.
+-----------------------------------------------------------
+---------------------------Section 12 ----------------------
+--------------------State Normalization --------------------
+video 141 -- data normalization + collection page 
+
+en lugar de guardar data (list of elements) en un array lo hacemos en un objeto 
+a esto lo llaman data normalization !
+
+comenta que no conviene usar collections.find() 
+porque en caso de tener mucha data va a tardar demasiado !!
+por eso conviene usar la data en un objeto 
+
+ahora convierto shop data en lugar de un array en un objeto {}
+simplemente cambia [] por {}
+
+-----------------------------------------------------------
+video 142 -- optional hash tables vs arrays 
+
+In the previous lesson we learned about Objects (Hash Table data structure) being better for searching for items than Array. 
+This is a common computing optimization when talking about data structures. 
+If you want to learn more about why this is, this is a great resource for you to use:
+
+ https://www.kirupa.com/html5/hashtables_vs_arrays.htm
+
+-------------------------------------------------------
+video 143 -- data flow in our app 
+
