@@ -1966,3 +1966,9 @@ git status
 git add -A 
 git commit -m "removed redux-logger from production build" 
 git push heroku master 
+
+comenta que al hacer el deploy en cuenta gratis compartimos un dyno 
+nos dan 500 minutes por mes para hacer cambios 
+vemos en el dashboard en el icono de nuestra app si no lo usamos unas zzz significa que esta dormida... y cuando alguien hace click debe despertarla consumiendo unos segundos 
+
+comenta que en caso de necesitar mas tiempo heroku da la posibilidad de ir al seteo de mi cuenta y si agregamos una tarjeta de credito nos da unos minutos mas...
