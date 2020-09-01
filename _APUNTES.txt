@@ -1682,6 +1682,8 @@ para habilitar pagos necesitamos back end services (no lo cubre aca , lo vemos m
 https://stripe.com/
 
 sign in free account !! 
+info@webjcb.com
+stripetaj....
 ---------------------------------------------------------
 video 146 -- stripe integration 
 
@@ -1707,7 +1709,7 @@ luego lo importamos en checkout.component
 
 ------------test datos tarjeta:
 4242 4242 4242 4242 
-csv 123 
+cvc 123 
 01/22 
 ------------
 https://stripe.com/docs/testing#cards
@@ -1745,8 +1747,222 @@ solo tengo que colocar el favicon en public
 
 con esto comenta terminamos nuestra app !! 
 falta deploy ..
+css heroku apolo hooks!
+comenta que con hooks casi no hace falta usar redux !
+comenta que en los ultimos anos las companias han desarrollado react usando redux y por eso es necesario saber usarlo 
 
+veremos firebase y finalaciones en backend en stripe
+---
+comenta podemos no usar heroku y hacer todo con firebase!
+
+---to host front end, you can use firebase hosting
+
+https://firebase.google.com/docs/hosting
+
+---for backend you can use firebase cloud function
+
+https://firebase.google.com/docs/functions
+
+------------------
+the buildpack is only for heroku, you dont need buildpack if you deploy on firebase 
+---
+for custom domian, please follow this guide
+
+https://devcenter.heroku.com/articles/custom-domains
+
+--------------------------
 git status 
 git add -A 
 git commit -m "stripe integration, change favicon"
 git push origin master 
+---------------------------------------------------------------
+---------------------------Section 14 -----------------------
+---------------------Deploying to production ----------------
+video 150 -- deploying to heroku 
+
+Heroku 
+https://www.heroku.com/
+
+Heroku CLI 
+https://devcenter.heroku.com/articles/heroku-cli
+
+Heroku Buildpack 
+https://github.com/mars/create-react-app-buildpack
+
+Heroku nos provee una url donde alojar nuestra app 
+
+Nos dan free amount of bandwidth que alcanza para por ej un portfolio o para test de nuestra app 
+
+pasado cierto limite...? comenzas a pagar 
+
+----------
+mi cuenta en heroku: 
+user cali
+info@webjcb.com
+Herokutaj...
+----------------------------------
+comenta que ademas de ingresar al dashboard de heroku podemos operar a traves del CLI que nos permite realizar el push de nuestra app.
+https://devcenter.heroku.com/articles/heroku-cli
+
+descargo para windows 
+veo ya lo tenia instalado 
+heroku/7.42.4 win32-x64 node-v12.16.2  !!!!
+
+para usar el cli debo logearme:
+heroku login  (en el terminal)
+esto me abre el navegador en la pag de login 
+me logeo y me sale mensaje:
+You can close this page and return to your CLI. It should now be logged in.
+
+ahora sigo desde el terminal! 
+veo me sale
+Logging in... done
+Logged in as info@webjcb.com
+
+primero debo crear proyecto 
+y agregar buildpack que hace deploy de react como static website 
+
+heroku create crwn-shopping --buildpack https://github.com/mars/create-react-app-buildpack.git 
+me sale nombre already exists... cambio por 
+heroku create crwn-cali --buildpack https://github.com/mars/create-react-app-buildpack.git 
+
+comenta que con esto no tengo que correr npm run build por nuestra cuenta ya que con buildpack crea production 
+
+luego 
+git push heroku master 
+
+vemos crea production deploy de nuestra app 
+cuando termina el proceso nos da la url para acceder a la app 
+en mi caso sale:
+remote: Verifying deploy... done.
+To https://git.heroku.com/crwn-cali.git
+ * [new branch]      master -> master
+
+pero ojo: la url correcta es:
+https://crwn-cali.herokuapp.com/
+
+si entro en la otra me da este error-->
+error method not allowed 
+-----
+luego otro error al intentar logearme en
+https://crwn-cali.herokuapp.com/
+
+en consola se ve error...
+Esto es porque firebase necesita saber que url tiene permitido dejar acceso a la app o base de datos ...
+vamos a firebase  
+authentication / sign-in-method 
+agrego domain (abajo )
+https://git.heroku.com/crwn-cali.git (agregue por error este)
+agrego:
+https://crwn-cali.herokuapp.com/
+ 
+ (esta url la obtuve ingresando a mi dashboard y haciendo click en ir a la app )
+
+ y ahora si!!!
+ ----------------------
+ cosas para arreglar:
+ quitar los console.log....
+ css responsive !!
+ se ve mal en  mobile 
+
+ no es compatible con iE si con edge 
+ --------------------------------------------------------------
+ video 151 -- resources: buildpack 
+
+ You can learn more about the buildpack we used in the previous video by following the documentation here:
+  https://github.com/mars/create-react-app-buildpack
+
+-------------------------------------------------------------
+video 152 -- linkin github with heroku 
+
+If you would like to not manually deploy the the app like we have seen in the previous video every time, and you want the app to redeploy anytime you update MASTER in your github repository, then you can set that up through Heroku by following these steps: https://devcenter.heroku.com/articles/github-integration
+
+However, since we will be working on the project in the next sections, we recommend that you do not do this so that as you code along, even if your website breaks, your current version of the website is still live on Heroku until you decide to redeploy next.
+-------------------------------------------------------------
+video 153 -- optional: git + heroku commands
+
+If you are curious how the below command works, read on...
+
+$ git push heroku master
+
+There are always few other steps to execute: 
+Installing Git and Heroku, 
+creating a local Git repo, 
+signing-up to heroku, 
+log-in heroku via command-line, 
+creating heroku handle to hosting point (explained in PART 2)
+
+1. A local Git repository:
+
+    $ git add .
+    $ git commit -m "my first commit"
+    Created initial commit 5df2d09: my first commit
+     44 files changed, 8393 insertions(+), 0 deletions(-)
+     create mode 100644 README
+     create mode 100644 Procfile
+     create mode 100644 app/controllers/source_file
+    ...
+2. Have sign-up(ed) for Heroku and logged-in via command-line:
+
+$ heroku login // or you can do this online
+Enter your Heroku credentials.
+Email: user@example.com
+Password:
+Could not find an existing public key.
+Would you like to generate one? [Yn]
+Generating new SSH public key.
+Uploading ssh public key /Users/adam/.ssh/id_rsa.pub
+
+
+PART 2: but what does heroku and master indicate?
+
+It is more of a Git question than Heroku - Heroku is a hosting platform, which depends on Git (Distributed Version Control System) for deployment.
+
+The basic concept of 'push' is pushing some thing (file, app, ..) we have locally (in our working machine) to somewhere else, in this case to a remote repository (remote machine).
+
+In Git before using 'push' we create a remote (handle) which acts as a reference to a remote repository (Complete URL), we do so using the following command:
+
+$ git remote add <remote-name-of-our-choice> <URL-where-you-be-pushing-yourapp>
+
+The basic structure of 'push' command is:
+
+$ git push <remote-name> <branch>
+So $ git push heroku master is actually pushing your code/app/file (from some local Git repo) to a remote repo 'heroku' .
+
+wondering when this 'heroku' remote got created, it was added when you executed $ heroku create
+
+$ heroku create
+Creating stark-fog-398... done, stack is cedar
+http://stark-fog-398.herokuapp.com/ | git@heroku.com:stark-fog-398.git
+Git remote heroku added
+
+Do notice the last line "Git remote heroku added".
+
+to make it more clear, here's a Git command to check/output all the remotes: $ git remote -v will display something similar to the following
+
+$ git remote -v
+heroku     git@heroku.com:somerepo.git (fetch)
+heroku     git@heroku.com:somerepo.git (push)
+So we can assume that the following command was executed (implicitly) somewhere, when you did $ heroku create , hence creating the heroku remote to some heroku repo (url)*
+
+$ git remote add heroku git@heroku.com:somerepo.git
+
+----------------------------------------------------------
+video 154 -- optimizing production build 
+
+comenta no queremos mostrar nuestros logger messages en produccion 
+
+recuerda lo tenemos instalado en store.js y funciona para mostrar en desarrollo 
+el logger es un middlewares 
+cambio en store.js 
+const middlewares = [logger]
+ahora 
+const middlewares = []
+if (process.env.NODE.ENV === 'development') {
+    middlewares.push(logger)
+}
+
+git status
+git add -A 
+git commit -m "removed redux-logger from production build" 
+git push heroku master 
