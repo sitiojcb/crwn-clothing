@@ -1968,7 +1968,319 @@ git commit -m "removed redux-logger from production build"
 git push heroku master 
 
 comenta que al hacer el deploy en cuenta gratis compartimos un dyno 
-nos dan 500 minutes por mes para hacer cambios 
+y nos dan 500 minutes por mes para hacer cambios 
 vemos en el dashboard en el icono de nuestra app si no lo usamos unas zzz significa que esta dormida... y cuando alguien hace click debe despertarla consumiendo unos segundos 
 
 comenta que en caso de necesitar mas tiempo heroku da la posibilidad de ir al seteo de mi cuenta y si agregamos una tarjeta de credito nos da unos minutos mas...
+--------------------------------------------------------------
+-----------------------Section 15 ----------------------------
+--------------------styled components ------------------------
+video 155 -- css in js 
+
+BEM Block | __Element | Modifier
+http://getbem.com/
+en general conviene seguir esto para evitar errores ej trabajo en conjunto y otro programador puede usar la misma clase y producir un error 
+
+Con react muestra como escribe una const con un objeto con varios estilos css y luego los aplica a un componente...
+const textStyles = {
+  color:'red',
+  fontSize: '24px'
+}
+luego en el componente:
+<div style={textStyles}> Texto prueba</div>
+---
+si bien esto tambien es css en js 
+ comenta no es lo ideal. Tiene problemas por ej para acceder al hover etc, es decir no soporta todos los selectors que podemos necesitar en un trabajo.
+
+Propone usar libreria:
+
+https://styled-components.com/
+
+Pro es performance faster 
+ademas encapsulamos el css a su componente 
+---------------------------------------------------------------
+video 156 -- styled-components 
+
+npm install --save styled-components
+luego importo en App.js 
+import styled from 'styled-components'
+luego para usarlo en el componente 
+const Text = styled.div`
+color:red;
+font-size:24px;
+`;
+es decir puedo escribir css 
+y ahora en lugar de usar el div uso 
+<Text>texto de prueba</text>
+
+si inspeccionamos en el navegador vemos escribe:
+<div class="2342vdf">texto de prueba</div>
+es decir genera un unico string para una clase 
+por eso comenta never bleed nunca va a chocar con otra 
+
+comenta que si bien hasta ahora teniamos en cada componente un estilo aplicado a este. cuando trabajamos en grupos puede generarse problemas al usar un mismo estilo 
+
+tambien podemos si queremos usar props 
+<Text isActive={true}>texto de prueba</Text>
+agrega al estilo en la constante Text arriba el css para cuando esta activo:
+ej
+border: ${({isActive}) => isActive ? '2px solid red' : 'none' }
+
+comenta que gracias a esto tenemos incluso mayor control del css en el componente 
+
+--------------------------------------------------------------
+video 157 -- styled-component in our app 
+
+comienza cambiando el componente homepage
+antes:
+import './homepage.styles.scss'
+const HomePage = () => (
+    <div className="homepage">
+        <Directory />
+    </div>
+);
+ahora
+import { HomePageContainer } from './homepage.styles'
+
+vemos al inspeccionar que genera <div class="unico..."> 
+---------------
+luego hacemos lo mismo en header en donde es mas complicado 
+
+cambio 
+ <div className='header'>
+ por 
+ <HeaderContainer>
+
+ quito de header.component 
+ import './header.styles.scss'
+ cambio por 
+ import {HeaderContainer, LogoContainer, OptionDiv, OptionsContainer, OptionLink} from './header.styles'
+
+ luego mas abajo 
+ <div className='header'> pasa a ser <HeaderContainer>
+
+ <Link to='/' className='logo-container'>
+ por <LogoContainer to='/'>
+ <div className='options'> por <OptionsContainer>
+--------------------------------------------------------------
+video 158 -- thinking about tradeoffs
+
+--------------------------------------------------------------
+video 159 -- styled-components in our app II 
+
+comenta que puede usarse 
+<OptionLink as='div' o 
+<OptionLink as={componenteCualquiera}
+la ventaja con esto es que no necesita importar Link en header.component 
+
+----------------------------------------------------------------
+video 160 -- styled-components in our app III
+
+vamos al custom button component 
+comenta que hay tres estados diferentes para el boton y el css 
+
+creo custom-button.styles.jsx 
+antes:
+import './custom-button.styles.scss'
+
+const CustomButton = ({children,isGoogleSignIn, inverted, ...otherProps}) => (
+    <button className={`${inverted ? 'inverted' : ''} ${isGoogleSignIn ? 'google-sign-in' : ''} custom-button `} 
+    {...otherProps}
+    >
+    {children}
+    </button>
+)
+ahora:
+import {CustomButtonContainer} from './custom-button.styles'
+
+const CustomButton = ({children, ...props }) => (
+    <CustomButtonContainer {...props}>
+    {children}
+    </CustomButtonContainer>
+)
+---------------------------------------------------------
+video 161 -- exercise : styled-components 
+
+This is an optional exercise that you don't need to complete to move on to the next section. As Yihua mentioned, you can try converting your entire app to style components and use the attached github repository as the answer file that we have provided for you. Good luck!
+
+https://github.com/zhangmyihua/lesson-26-complete
+
+-------------------------------------------------------------
+---------------------------Section 16 -------------------------
+--------------------Advanced redux and firebase ---------------
+video 163 -- overview 
+
+comenta hasta ahora trabajamos con shop.data.js 
+en realidad debe tomarse de una base de datos 
+------------------------------------------------------------------
+video 164 -- quick note: firebase 
+
+Over the next couple of videos we are going to be covering some specific Firebase commands. Keep in mind that as a React Developer, you do not need to memorize these things and most of the time you can always refer to the firebase documentation for more information. We decided to include the process in the course so that you get a clear picture into what  is involved in creating a full scale application.
+
+If for some reason you get overwhelmed with Firestore, just keep going and use our provided code since this is not the "important" part of the course.
+
+----------------------------------------------------------------------
+video 165 -- Firebase refresher 
+
+objetos en firebase:
+podemos obtener mediante la consulta a una bd de firestore solo
+1-queryReferences 
+2-Snapshot
+
+Puede tratarse de una collection o bien de un documento 
+Si al hacer la consulta no existe nada, igual devuelve algo de esto.
+
+1-queryReferences is an object that represents the current place in the db that we are querying.
+ej:
+firestore.doc('users/:userId');
+firestore.collections('/users');
+
+The queryReferences object doesn't have the actual data of the document or collection.
+It has properties that tell us details about it, or the method to get the Snapshot object wich give us the data we are loking for.
+
+---------------------
+DocumentReference obj vs CollectionReference obj 
+
+to perform CRUD (create, retrieve, update, delete) we use DocumentReference.
+
+to add:
+we can documents to collections using CollectionReference obj .add({value:prop})
+
+to get: 
+we get the Snapshot obj  from referenceObject using get( )
+
+DocumentReference returns documentSnapshot obj.
+CollectionReference returns a querySnapshot obj.
+
+to check if exists:
+we use documentSnapshot obj using .exists thar returns boolean .
+
+to get properties of data:
+we can call .data() method that returns json obj.
+
+ej userAuth que es el obj de firebase que nos permite chequear si esta logeado.
+para realizar la consulta 
+const userRef = firestore.doc(`users/${userAuth: uid}`});
+luego con get obtengo el snapShot 
+const Snapshot = userRef.get();
+para crear nuevo obj:
+userRef.set({
+  displayName,
+  email,
+  etc
+})
+
+----------------------------------------------------------------------
+video 166 -- Firebase refresher II
+
+querySnapshot from CollectionReference obj 
+.empty returns boolean 
+To get all:
+.docs returns array of our documents as documentSnapshot obj.
+
+en firebase.utils.js 
+agrego:
+const collectionRef = firestore.collection('users');
+chequeamos con 
+ console.log({collection: collectionSnapshot.docs.map(doc => doc.data())})
+ con doc.data()devuelve json 
+ -------------------------------------------------------------------
+ video 167 -- moving our shop data to firebase 
+
+ comenta firebase es lo que se conoce como nosql database 
+ debido a la manera que guarda la info o data 
+ por ej un usuario puede tener campos como email y telef mientras que otro solo tener una imagen o una direccion...
+
+ eso da flexibilidad aun cuando puede ser un problema para el front end 
+
+ se puede forzar a que guarden datos o campos 
+ el field puede tener diferentes tipos de datos 
+ string/number/boolean/map(con key)/array(0,1...),null,timestamp, geopoint
+
+ edita App.js porque comenta renderiza una vez 
+
+ queremos pasar el contenido de shop.data.js a firebase de una es decir no hacerlo manualmente.
+
+ para esto editamos firebase.utils.js 
+
+ export const addCollectionAndDocuments = (collectionKey, objectsToAdd ) => {
+    const collectionRef = firestore.collection(collectionKey);
+    console.log(collectionRef)
+}
+luego llamamos addCollectionAndDocuments en App.js 
+lo hace en componentDidMount
+ -------------------------------------------------------------------
+ video 168 -- moving our shop data to firebase II
+
+ https://firebase.google.com/docs/firestore/manage-data/transactions
+
+comenta que en firestore puedo hacer un set por vez
+y esto es porque se dispara una por vez.
+Que pasa entonces si en el camino se corta la conexion ...
+para que sea confiable necesito que al correr la funcion se logre hacer el set de lo que quiero completo.
+
+comenta que en un request necesito hacer un batch o group 
+ya que si por ej se corta la conexion al hacer una peticion ... debo asegurarme que vuelva toda la data y no una parte, es decir o viene todo no nada gracias a este batch 
+
+map() comenta va a devolver un nuevo array. Por eso usa en su lugar forEach() que no lo cambia 
+
+---
+muestra como hacer para que shop.data.js se agregue a firebase y luego borra el codigo que uso.
+
+en firebase.utils.js agrega 
+ const batch = firestore.batch()
+    objectsToAdd.forEach(obj => {
+        const newDocRef = collectionRef.doc()
+       // console.log(newDocRef)
+       //set de value 
+       batch.set(newDocRef, obj )
+    })
+   return await batch.commit()
+
+luego en App.js 
+addCollectionAndDocuments('collections', 
+        collectionsArray.map(
+          ({title, items}) => ({ title, items})
+        ))
+
+comenta que luego de hacer esto y ver como ya se agrego en firebase.. 
+ahora lo va a borrar. 
+Yo hago un commit:
+git status 
+git add -A 
+git commit -m"subo shop.data.js a firebase"
+git push origin master 
+---------------------------------------------------------------------
+video 169 -- reviewing what we have done 
+
+pregunta: crear mas de un collection en firestore y que se relacionen?
+resp: ver 
+https://www.youtube.com/watch?v=o7d5Zeic63s
+
+firestore rules:
+rule 1:
+-documents has limits
+-documents can't have more than 20000 fields 
+-documents que son accedidos al mismo tiempo por varios usuarios 1seg?
+
+rule 2:
+avoid bid data in document?
+
+rule3:
+queries are shallow 
+
+rule4:
+you are billed by the number of reads and writes you perform 
+significa que si creo subcollections va a leer mas 
+muestra como usa mejor un map un mismo objeto en lugar de varis subdivisiones
+
+rule5:
+queries find document in a single collection
+
+rule6: 
+array are weird 
+no funcionan bien en busquedas de firestore?
+
+-------------------------------------------------------------------
+video 170 -- 
+

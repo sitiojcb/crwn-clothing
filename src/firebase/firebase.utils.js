@@ -19,9 +19,13 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
    // console.log(firestore.doc('users/1242423')) va a devolver exist false
     //const userRef = firestore.doc('users/1242423')
     const userRef = firestore.doc(`users/${userAuth.uid}`)
+    //video 166 agrego 
+ //   const collectionRef = firestore.collection('users');//166
     //para obtener el snapshot oj 
     const snapShot = await userRef.get()
     //console.log(snapShot)
+   // const collectionSnapshot = await collectionRef.get();//166
+  //  console.log({collection: collectionSnapshot.docs.map(doc => doc.data())})//166
     if(!snapShot.exists) {
         //si no existe quiero crear data 
         const {displayName, email } = userAuth;
@@ -40,7 +44,20 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     return userRef;
 };
 
-
+//video 167 
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd ) => {
+    const collectionRef = firestore.collection(collectionKey);
+    //console.log(collectionRef)
+    const batch = firestore.batch()
+    objectsToAdd.forEach(obj => {
+        const newDocRef = collectionRef.doc()
+       // console.log(newDocRef)
+       //set de value 
+       batch.set(newDocRef, obj )
+    })
+    //como retorna una promesa usa await
+   return await batch.commit()
+}
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
