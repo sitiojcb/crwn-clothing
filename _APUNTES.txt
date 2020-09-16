@@ -2528,3 +2528,71 @@ pero tampoco conviene subirlo porque quizas no nos interese descargar toda la da
 
 git add -A 
 git commit -m "implement code that pulls data from firestore and stores it in shop reducer, also include our WithSpinner HOC"
+
+--------------------------------------------------------------------
+video 178 -- redux thunk 
+
+incluimos redux thunk 
+npm install --save redux-thunk
+---------------------------------------------
+https://www.npmjs.com/package/redux-thunk
+nota:
+If you use Redux Thunk 2.x in CommonJS environment, don’t forget to add .default to your import:
+- var ReduxThunk = require('redux-thunk')
++ var ReduxThunk = require('redux-thunk').default
+-------------------------------------
+If you used ES modules, you’re already all good:
+
+import ReduxThunk from 'redux-thunk' 
+
+es un middleware 
+en store.js 
+const middlewares = [ReduxThunk]
+--
+shop.types
+edito 
+--
+shop.actions
+cambio 
+export const updateCollections = collectionsMap => ({
+    type: ShopActionTypes.UPDATE_COLLECTIONS,
+    payload: collectionsMap
+})
+
+-------------------
+If redux-thunk middlewares is enabled 
+any time you attempt to dispatch a function instead  of an object ,
+the middleware will call that function with dispatch method itself as the first argument.
+
+-------------------------------------------------------------------------
+video 179 -- what does thunk do
+
+------------------------------------------------------------------------
+video 180 -- debugging our code 
+
+en shop.selectors...
+comenta que usa !!shop.collections para devolver true/false 
+en caso de !!{} si es nulo(porque todavia no bajo) devuelve false 
+
+-----------------------------------------------------------------------
+---------------------------Section 19 -----------------------------------
+--------------------container pattern ----------------------------------
+video 181 -- container pattern 
+creo collections-overview-container.jsx 
+
+usa compose que le permite mezclar... componentes /funciones 
+
+comenta: 
+containers not render anything . They just pass props down to components.!
+------------------------------------------------------------------------
+video 182 -- refactoring is a tradeoff 
+
+tradeoff == compensacion 
+comenta que hay que evaluar si conviene o no refactoring all the time..
+
+en la proxima seccion vamos a refactor pensando en grandes proyectos 
+-----------------------------------------------------------------------
+--------------------------Section 20 -----------------------------------
+------------------redux saga -------------------------------------------
+video 183 -- intro to sagas
+

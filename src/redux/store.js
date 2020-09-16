@@ -3,8 +3,10 @@ import { persistStore } from 'redux-persist'
 
 import logger from 'redux-logger'
 import rootReducer from './root-reducer'
+import ReduxThunk from 'redux-thunk' 
 
-const middlewares = []
+const middlewares = [ReduxThunk]
+
 if (process.env.NODE_ENV === 'development') {
     middlewares.push(logger)
 }
