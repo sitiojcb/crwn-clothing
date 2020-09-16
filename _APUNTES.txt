@@ -2243,16 +2243,24 @@ addCollectionAndDocuments('collections',
           ({title, items}) => ({ title, items})
         ))
 
-comenta que luego de hacer esto y ver como ya se agrego en firebase.. 
-ahora lo va a borrar. 
+----
 Yo hago un commit:
 git status 
 git add -A 
 git commit -m"subo shop.data.js a firebase"
 git push origin master 
+---
+comenta que luego de hacer esto y ver como ya se agrego en firebase.. 
+ahora lo va a borrar. !!
+mantiene los cambios en firebase.utils.js 
+
+comenta ahora debemos hacer un pull de nuestra base de datos en firebase en lugar de importar shop.data en nuestro shop.reducer
 ---------------------------------------------------------------------
 video 169 -- reviewing what we have done 
 
+hasta ahora teniamos entonces en nuestro shop.reducer a shop.data como initial value... pero ahora al subirlo a firestore ese value va a ser dinamico 
+
+-------
 pregunta: crear mas de un collection en firestore y que se relacionen?
 resp: ver 
 https://www.youtube.com/watch?v=o7d5Zeic63s
@@ -2282,5 +2290,241 @@ array are weird
 no funcionan bien en busquedas de firestore?
 
 -------------------------------------------------------------------
-video 170 -- 
+video 170 -- bringing shop data to our app
 
+comenta que route name por ej hats es importante para el front end no para el backend 
+pero ahora lo necesito 
+
+donde vamos a colocar el fetch data?
+tenemos que pensar en el arbol...de mis componentes recordar el flujo...
+y en donde voy a necesitar esa data?
+
+elige hacer el fetch en nuestro shop.component 
+lo primero es convertir ese functional component en class component 
+functional component:
+const ShopPage = ({match}) => {
+    console.log(match)
+    return (
+        <div className='shop-page'>
+            <Route extact path={`${match.path}`} component={CollectionsOverview} />
+            <Route exact path={`${match.path}/:collectionId`}  component={ CollectionPage } />
+        </div>
+    )
+}
+ahora class component:
+class ShopPage extends React.Component  {
+    unsubscribeFromSnapshot = null;
+
+    componentDidMount() {
+        const collectionRef = firestore.collection('collections')
+        //para hacer fetch
+        collectionRef.onSnapshot(async snapshot => {
+          //  console.log(snapshot)
+        })
+    }
+    render() {
+        const { match } = this.props;
+        return (
+            <div className='shop-page'>
+                <Route extact path={`${match.path}`} component={CollectionsOverview} />
+                <Route exact path={`${match.path}/:collectionId`} component={CollectionPage} />
+            </div>
+        )
+    }
+}
+--------------------------------
+luego en firebase.utils 
+export const convertCollectionsSnapshotToMap = (collections) => {
+    const transformCollection = collections.docs.map(doc => {
+        const { title, items } = doc.data()
+        return {
+            routeName: encodeURI(title.toLowerCase()),
+            id: doc.id,
+            title,
+            items
+        }
+    })
+    console.log(transformCollection)
+}
+-----------------------------------------------------------------
+video 171 -- adding shop data to redux 
+
+comenta vamos a usar nuestro reducer en nuestra transformCollection array 
+
+en firebase.utils.js 
+
+
+creo shop.types.js y shop.actions.js 
+
+chequear/comparar codigo:
+https://www.diffchecker.com/diff
+
+cloning hasta aca 
+https://github.com/Dan-Y-Ko/crown-clothing/tree/0a24a2f93a3016a8ee176a5a54b77eb3704cb893
+
+-----
+pregunta:
+Why are we not unsubscribing from firebase?
+resp:
+you indeed need to unsubscribe it just like how we did to onAuthStateChange
+
+--------------------------------------------------------------------
+-------------------------Section 17 --------------------------------
+-------------------HOC patterns ------------------------------------
+video 172 -- WithSpinner HOC 
+
+-------------HOC (High Order Component)
+
+css animations:
+https://www.w3schools.com/css/css3_animations.asp
+
+quitamos shop.data.js  de shop.reducer 
+
+cambio 
+const INITIAL_STATE = {
+    collections: SHOP_DATA
+}
+por
+const INITIAL_STATE = {
+    collections: null
+}
+---
+al hacer el cambio salta error 
+cannot convert undefined or null into object 
+debo cambiar shop.selector.js 
+export const selectCollectionsForPreview = createSelector(
+    [selectCollections],
+    collections => Object.keys(collections).map(key => collections[key])
+);
+------transformarlo con  un ternary para el caso en que sea null...
+export const selectCollectionsForPreview = createSelector(
+    [selectCollections],
+    collections => collections ? 
+    Object.keys(collections).map(key => collections[key]) :
+    []
+);
+--------------
+otro error cannot read property women of null 
+export const selectCollection = (collectionUrlParam) =>
+    createSelector([selectCollections], 
+        (collections) => collections[collectionUrlParam]
+    );
+------------cambio por:
+export const selectCollection = (collectionUrlParam) =>
+    createSelector([selectCollections], 
+        (collections) =>
+        collections ? collections[collectionUrlParam] : null
+    );
+
+---------------------------
+comenta que al trabajar con async necesitamos trabajar con loading state
+creo en components/ with-spinner / with-spinner.component.jsx 
+
+-----------
+pregunta: why we don't need componentWillUnmount() { this.unsubscribeFromSnapshot(); } ?
+
+resp: the code in shop component is written using promise-based approach while the one in app.js is written using observable based approach. In an observable based approach, you are receiving data in an endless stream so you need to unsubscribe from it or else you will get memory leaks. 
+
+pregunta: How can we make a call API in redux?
+resp: calling external API isn't covered in the course. 
+If you wanted to do that you just use something like Axios and fetch the data from the external api in your action.
+
+For example, from one of my old projects:
+
+export const fetchUser = () => async dispatch => { 
+   const res = await axios.get("/api/current_user"); 
+   dispatch({ 
+      type: FETCH_USER, 
+      payload: res.data 
+   });
+};
+--------------------------------------------------------------------
+video 173 -- WithSpinner II 
+
+
+comenta que en shop.component.jsx 
+podemos agregar 
+constructor() {
+        super()
+        this.state = {
+            loading: true
+        }
+    }
+-----
+o pasar el state:
+state = {
+  loading: true
+}
+ya en el el class component react ve el state y lo resuelve sin necesidad de escribir constructor....(esto en versiones nuevas)
+
+
+---------------------------------------------------------
+video 174 -- quick note 
+If you are still finding it difficult understanding how 
+Higher Order Components can be useful, 
+you have an optional video next which we explain in higher detail 
+when HOCs are useful and how we can build them ourselves. Enjoy!
+
+--------------------------------------------------------------------
+video 175 -- how to build HOC 
+
+https://github.com/ZhangMYihua/higher-order-components-explained
+
+ej connect or WithSpinner 
+
+json placeholder site para pruebas: 
+
+https://jsonplaceholder.typicode.com/posts 
+
+-----------------------------------------------------------------------
+-----------------------------Section 18 -------------------------------
+------------------------Asynchronoux Redux ---------------------------
+video 176 -- observables  + observer pattern 
+
+comenta que si no se usa snapShot o el onAuthStateChanged para el live reload podemos usar promise pattern 
+
+observables y rxjs 
+observerr pattern 
+un observer es un piece of code with 3 functions calls on it:
+1-next(nextValue)=> {do something with value}
+2-error(error) => {do something with error}
+3-complete()m=> {do something when finished}
+
+mediante lo que llama suscription atamos el observer a un evento 
+
+asi es como trabajamos con firebase... pero no todos tienen esto implementado en sus app o desarrollos 
+por eso vamos a ver como usar promesas 
+------------------------------------------------------------------------
+video 177 -- promise pattern 
+
+en Shop.component cambio
+this.unsubscribeFromSnapshot = collectionRef.onSnapshot(async snapshot
+por 
+collectionRef.get().then( snapshot => {
+
+------------
+firebase nos permite usar la base de datos como api 
+
+mi id del proyecto: crwn-db-79248
+
+https://firebase.google.com/docs/firestore/use-rest-api#making_rest_calls
+
+https://firestore.googleapis.com/v1/projects/YOUR_PROJECT_ID/databases/(default)/documents/cities/LA
+
+----------
+muestra como usar fetch: 
+
+ fetch('https://firestore.googleapis.com/v1/projects/crwn-db-79248/databases/(default)/documents/collections').then(
+            response => response.json()
+        ).then(collections => console.log(collections))
+
+pero comenta es demasiado nested... 
+
+comenta quiere sacar la peticion de componentDidMount...
+es que puede usarlo en otro lugar de la app...
+y no quiero escribirlo de nuevo para acceder nuevamente...
+pero tampoco conviene subirlo porque quizas no nos interese descargar toda la data cuando un usuario simplemente visita el sitio...
+
+
+git add -A 
+git commit -m "implement code that pulls data from firestore and stores it in shop reducer, also include our WithSpinner HOC"

@@ -44,7 +44,7 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     return userRef;
 };
 
-//video 167 
+//video 167 --esto lo mantiene
 export const addCollectionAndDocuments = async (collectionKey, objectsToAdd ) => {
     const collectionRef = firestore.collection(collectionKey);
     //console.log(collectionRef)
@@ -58,6 +58,25 @@ export const addCollectionAndDocuments = async (collectionKey, objectsToAdd ) =>
     //como retorna una promesa usa await
    return await batch.commit()
 }
+
+export const convertCollectionsSnapshotToMap = (collections) => {
+    const transformedCollection = collections.docs.map(doc => {
+        const { title, items } = doc.data //o doc.data()
+        return {
+            routeName: encodeURI(title.toLowerCase()),
+            id: doc.id,
+            title,
+            items
+        }
+    })
+    //console.log(transformedCollection)
+    //realiza loop comenzando con Hats
+   return transformedCollection.reduce((accumulator, collection) => {
+        accumulator[collection.title.toLowerCase()] = collection
+        return accumulator
+    }, {})
+}
+
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
